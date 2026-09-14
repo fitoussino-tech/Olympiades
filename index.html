@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#080B12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ====================================================================
@@ -276,6 +277,20 @@ section{padding:38px 0}
 .rapides button:hover{border-color:var(--un);color:var(--texte)}
 .retour-ligne{display:flex;justify-content:space-between;font-size:.85rem;padding:9px 0;border-top:1px solid var(--bord)}
 .retour-ligne .gain{font-weight:700;color:var(--vert)}
+
+async function retirerPari(quand){
+  if(!moi) return;
+  const liste = (joueurs[moi] && joueurs[moi].paris) || [];
+  const p = liste.find(x=>x.date===quand);
+  if(!p) return note("Ticket introuvable.", true);
+  const d = defiPar(p.defi);
+  if(!d || !ouvert(d)) return note("Trop tard : les paris sont fermés sur cette épreuve.", true);
+  if(!confirm("Retirer ce ticket de "+nb(p.mise)+" points ? Les points reviennent sur votre solde.")) return;
+  try{ await supprimerPari(quand); }
+  catch(e){ return note(e.message || "Retrait refusé.", true); }
+  note("Ticket retiré · "+nb(p.mise)+" points rendus.");
+  await actualiser(true, true);
+}
 
 /* ---------- Mes paris ---------- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
@@ -579,7 +594,7 @@ footer .zone{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 <footer>
   <div class="zone">
     <span>Pseudos, mises et soldes sont visibles par tous les participants.</span>
-    <span>Épreuves, cotes et résultats tenus par les deux athlètes.</span>
+    <span id="etat-base">…</span>
   </div>
 </footer>
 
@@ -605,6 +620,7 @@ footer .zone{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
       <button type="button" data-m="250">250</button>
       <button type="button" data-m="max">Max</button>
     </div>
+    <div class="retour-ligne"><span class="faible">Solde disponible</span><span class="num" id="panier-solde">0 pts</span></div>
     <div class="retour-ligne"><span class="faible">Retour potentiel</span><span class="gain num" id="panier-retour">0 pts</span></div>
     <button class="btn large" id="btn-valider-pari" type="button" style="margin-top:14px">Valider le pari</button>
   </div>
@@ -784,6 +800,23 @@ footer .zone{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
    les résultats, donc un ticket ne peut pas être payé deux fois.
    ===================================================================== */
 
+/* =====================================================================
+   BRANCHEMENT SUPABASE
+   Collez ci-dessous l'URL et la clé publique de votre projet
+   (Supabase > Settings > API). Tant que les deux lignes sont vides,
+   le site fonctionne en solo dans le navigateur, comme avant.
+   ===================================================================== */
+const SUPABASE_URL = "";
+const SUPABASE_KEY = "";
+
+let sb = null;
+try{
+  if(SUPABASE_URL && SUPABASE_KEY && window.supabase)
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}catch(e){ sb = null; }
+const enLigne = !!sb;
+let codeOrga = null;   // gardé en mémoire après déverrouillage
+
 const SEL            = "duel-orga-v1";
 const EMPREINTE_BASE = "f0f7cf13ffc2797e";   // empreinte du code DUEL2026
 const DEPART      = 1000;
@@ -955,7 +988,61 @@ function etatPari(p){
 }
 
 /* ---------- Chargement ---------- */
+let baseOk = null;   // null = pas encore testée, true = connectée, false = injoignable
+function rendreEtatBase(){
+  const z = document.getElementById("etat-base");
+  if(!z) return;
+  if(!enLigne){
+    z.textContent = "Mode solo · les données restent dans ce navigateur";
+    z.style.color = "var(--faible)";
+  }else if(baseOk){
+    z.innerHTML = '<span class="pil ouvert"><i class="point"></i>base connectée · temps réel</span>';
+  }else{
+    z.innerHTML = '<span class="pil" style="color:var(--rouge);border-color:var(--rouge)">base injoignable</span>';
+  }
+}
+async function chargerEnLigne(){
+  const [cfg, eps, jrs, prs, pns] = await Promise.all([
+    sb.from("config").select("*").eq("id",1).maybeSingle(),
+    sb.from("epreuves").select("*"),
+    sb.from("joueurs").select("*"),
+    sb.from("paris").select("*"),
+    sb.from("pronostics").select("*")
+  ]);
+  const c = cfg.data || {};
+  etat = {
+    version:VERSION,
+    noms:[c.nom1 || "Noam", c.nom2 || "Thibault"],
+    photos:[c.photo1 || null, c.photo2 || null],
+    defis:(eps.data || []).map(e=>({
+      id:e.id, sport:e.sport, date:e.date,
+      c1:Number(e.c1), c2:Number(e.c2), regle:e.regle || "",
+      resultat:e.resultat || null, score:e.score || "",
+      note:e.note || "", photo:e.photo || null
+    }))
+  };
+  joueurs = {};
+  for(const j of (jrs.data || [])) joueurs[j.pseudo] = {photo:j.photo || null, paris:[], votes:{}};
+  for(const p of (prs.data || [])){
+    if(!joueurs[p.pseudo]) continue;
+    joueurs[p.pseudo].paris.push({defi:p.epreuve, camp:p.camp, mise:p.mise, cote:Number(p.cote), date:Number(p.jeton)});
+  }
+  for(const v of (pns.data || [])){
+    if(!joueurs[v.pseudo]) continue;
+    joueurs[v.pseudo].votes[v.epreuve] = v.camp;
+  }
+  const l = await casier.lire(CLE_MOI, false, null);
+  moi = (l && l.pseudo && joueurs[l.pseudo]) ? l.pseudo : null;
+  const o = await casier.lire(CLE_ORGA, false, null);
+  if(o && o.code){ codeOrga = o.code; estOrga = true; } else { estOrga = false; }
+  baseOk = true;
+}
+
 async function charger(){
+  if(enLigne){
+    try{ await chargerEnLigne(); rendreEtatBase(); return; }
+    catch(e){ baseOk = false; rendreEtatBase(); note("Connexion à la base impossible.", true); }
+  }
   etat = await casier.lire(CLE_ETAT, true, null);
   if(!etat || !Array.isArray(etat.defis) || etat.version !== VERSION){
     etat = ETAT_DEFAUT;
@@ -970,7 +1057,60 @@ async function charger(){
   estOrga = !!(s && s.empreinte && s.empreinte === empreinteCourante());
 }
 function empreinteCourante(){ return (etat && etat.empreinte) ? etat.empreinte : EMPREINTE_BASE; }
-async function sauverEtat(){ await casier.ecrire(CLE_ETAT, etat, true); }
+async function sauverEtat(){
+  if(enLigne){
+    if(!codeOrga) throw new Error("Poste verrouillé.");
+    const { error } = await sb.rpc("orga", {p_code:codeOrga, p_action:"etat", p_data:{
+      nom1:etat.noms[0], nom2:etat.noms[1],
+      photo1:etat.photos[0], photo2:etat.photos[1],
+      defis:etat.defis
+    }});
+    if(error) throw new Error(error.message);
+    return;
+  }
+  await casier.ecrire(CLE_ETAT, etat, true);
+}
+
+/* gestes des joueurs : en ligne, chaque geste est une ligne en base,
+   vérifiée côté serveur ; hors ligne, on retombe sur le stockage local */
+async function poserPronostic(idDefi, camp){
+  if(enLigne){
+    const { error } = await sb.from("pronostics")
+      .upsert({pseudo:moi, epreuve:idDefi, camp}, {onConflict:"pseudo,epreuve"});
+    if(error) throw new Error(error.message);
+    return;
+  }
+  await sauverMonJoueur(j=>{ j.votes=j.votes||{}; j.votes[idDefi]=camp; return j; });
+}
+async function poserPari(idDefi, camp, mise, cote){
+  if(enLigne){
+    const { error } = await sb.from("paris")
+      .insert({pseudo:moi, epreuve:idDefi, camp, mise, cote, jeton:Date.now()});
+    if(error) throw new Error(error.message);
+    return;
+  }
+  await sauverMonJoueur(j=>{
+    j.paris = j.paris||[];
+    j.paris.push({defi:idDefi, camp, mise, cote:Number(cote), date:Date.now()});
+    return j;
+  });
+}
+async function supprimerPari(jeton){
+  if(enLigne){
+    const { error } = await sb.from("paris").delete().eq("pseudo",moi).eq("jeton",jeton);
+    if(error) throw new Error(error.message);
+    return;
+  }
+  await sauverMonJoueur(j=>{ j.paris=(j.paris||[]).filter(x=>x.date!==jeton); return j; });
+}
+async function majPhoto(url){
+  if(enLigne){
+    const { error } = await sb.from("joueurs").update({photo:url}).eq("pseudo",moi);
+    if(error) throw new Error(error.message);
+    return;
+  }
+  await sauverMonJoueur(j=>{ j.photo = url; return j; });
+}
 async function sauverMonJoueur(modif){
   const frais = await casier.lire(CLE_JOUEURS, true, {}) || {};
   const actuel = frais[moi] || {votes:{}, paris:[]};
@@ -991,6 +1131,20 @@ async function entrer(){
   err.textContent = "";
   if(p.length < 2)       return err.textContent = "Deux caractères minimum dans le pseudo.";
   if(!/^\d{4}$/.test(c)) return err.textContent = "Le code doit faire exactement quatre chiffres.";
+  if(enLigne){
+    const { data, error } = await sb.rpc("connexion", {p_pseudo:p, p_code:c});
+    if(error) return err.textContent = "Connexion impossible : "+error.message;
+    if(data === "mauvais_code")   return err.textContent = "Ce pseudo est pris et le code ne correspond pas.";
+    if(data === "pseudo_court")   return err.textContent = "Deux caractères minimum dans le pseudo.";
+    if(data === "code_invalide")  return err.textContent = "Le code doit faire exactement quatre chiffres.";
+    moi = String(data).split(":").slice(1).join(":");
+    await casier.ecrire(CLE_MOI, {pseudo:moi}, false);
+    note(String(data).startsWith("cree") ? "Bienvenue "+moi+". 1 000 points crédités."
+                                         : "Content de vous revoir, "+moi+".");
+    $("#l-pseudo").value=""; $("#l-code").value="";
+    await actualiser(true, true);
+    return;
+  }
   joueurs = await casier.lire(CLE_JOUEURS, true, {}) || {};
   const existant = pseudoExistant(p);
   const emp = hacher("pin:"+c);
@@ -1194,10 +1348,14 @@ function rendreDefis(){
 
     /* pronostic gratuit */
     const monVote = moi && joueurs[moi] ? (joueurs[moi].votes||{})[d.id] : null;
-    if(jouable && !monVote){
+    if(jouable){
+      const aide = el("p","regle","Pronostic gratuit. Pour miser des points, touchez une cote ci-dessus.");
+      aide.style.margin = "0";
+      corps.appendChild(aide);
       const ligne = el("div","actions");
       [["1",n1],["2",n2]].forEach(([camp,nom])=>{
-        const bp = el("button","btn fantome","Je vois "+nom);
+        const actif = monVote===camp;
+        const bp = el("button","btn "+(actif?"":"fantome"), (actif?"✓ ":"")+"Je vois "+nom);
         bp.type="button"; bp.style.flex="1"; bp.style.fontSize=".82rem";
         bp.addEventListener("click",()=>voter(d.id,camp));
         ligne.appendChild(bp);
@@ -1238,6 +1396,13 @@ function rendreDefis(){
                   : st==="perdu" ? '<b style="color:var(--rouge)">−'+nb(p.mise)+'</b>'
                   : st==="rembourse" ? 'remboursée'
                   : 'retour '+nb(gain)+' pts')+'</span>';
+      if(st==="attente" && jouable){
+        const br = el("button","btn discret","Retirer");
+        br.type = "button";
+        br.style.cssText = "font-size:.74rem;padding:3px 10px;border:1px solid var(--bord-fort)";
+        br.addEventListener("click", ()=>retirerPari(p.date));
+        t.appendChild(br);
+      }
       corps.appendChild(t);
     }
 
@@ -1261,9 +1426,12 @@ function rendreDefis(){
 async function voter(id, camp){
   const d = defiPar(id);
   if(!d || !ouvert(d)) return note("Les pronostics sont fermés sur cette épreuve.", true);
-  await sauverMonJoueur(j=>{ j.votes=j.votes||{}; if(!j.votes[id]) j.votes[id]=camp; return j; });
-  note("Pronostic enregistré.");
-  toutRendre();
+  const avant = (joueurs[moi] && (joueurs[moi].votes||{})[id]) || null;
+  if(avant === camp) return;
+  try{ await poserPronostic(id, camp); }
+  catch(e){ return note(e.message || "Pronostic refusé.", true); }
+  note(avant ? "Pronostic changé." : "Pronostic enregistré.");
+  await actualiser(true, true);
 }
 
 /* ---------- Panier de pari ---------- */
@@ -1293,8 +1461,17 @@ function majRetour(){
   const d = defiPar(panier.defi);
   if(!d) return;
   const cote = panier.camp==="1" ? d.c1 : d.c2;
+  const dispo = solde(moi);
   const m = parseInt($("#panier-mise").value,10) || 0;
+  $("#panier-solde").textContent = nb(dispo)+" pts";
   $("#panier-retour").textContent = nb(m*cote)+" pts";
+  const trop = m > dispo;
+  $("#panier-retour").style.color = trop ? "var(--rouge)" : "";
+  const b = $("#btn-valider-pari");
+  b.disabled = !m || m < 1 || trop;
+  b.textContent = trop ? "Mise supérieure à votre solde"
+                : !m ? "Indiquez une mise"
+                : "Miser "+nb(m)+" pts sur "+(panier.camp==="1"?etat.noms[0]:etat.noms[1]);
 }
 async function validerPari(){
   if(!panier) return;
@@ -1305,14 +1482,25 @@ async function validerPari(){
   if(mise > solde(moi)) return note("Vous n'avez que "+nb(solde(moi))+" points.", true);
   const cote = panier.camp==="1" ? d.c1 : d.c2;
   const camp = panier.camp, id = panier.defi;
-  await sauverMonJoueur(j=>{
-    j.paris = j.paris||[];
-    j.paris.push({defi:id, camp, mise, cote:Number(cote), date:Date.now()});
-    return j;
-  });
+  try{ await poserPari(id, camp, mise, Number(cote)); }
+  catch(e){ return note(e.message || "Pari refusé.", true); }
   note("Pari validé · "+nb(mise)+" pts sur "+(camp==="1"?etat.noms[0]:etat.noms[1])+".");
   fermerPanier();
-  toutRendre();
+  await actualiser(true, true);
+}
+
+async function retirerPari(quand){
+  if(!moi) return;
+  const liste = (joueurs[moi] && joueurs[moi].paris) || [];
+  const p = liste.find(x=>x.date===quand);
+  if(!p) return note("Ticket introuvable.", true);
+  const d = defiPar(p.defi);
+  if(!d || !ouvert(d)) return note("Trop tard : les paris sont fermés sur cette épreuve.", true);
+  if(!confirm("Retirer ce ticket de "+nb(p.mise)+" points ? Les points reviennent sur votre solde.")) return;
+  try{ await supprimerPari(quand); }
+  catch(e){ return note(e.message || "Retrait refusé.", true); }
+  note("Ticket retiré · "+nb(p.mise)+" points rendus.");
+  await actualiser(true, true);
 }
 
 /* ---------- Mes paris ---------- */
@@ -1346,10 +1534,13 @@ function rendreTickets(){
                 : st==="rembourse" ? "remboursé"
                 : nb(retour)+" pts";
     const quand = p.date ? new Date(p.date).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}) : "";
+    const modifiable = d && ouvert(d) && st==="attente";
     return '<div class="ticket '+st+'">'
       + '<div class="info"><div class="quoi">'+echappe(d?d.sport:"Épreuve retirée")+' · '+echappe(p.camp==="1"?n1:n2)+'</div>'
       + '<div class="detail">'+nb(p.mise)+' pts à '+p.cote.toFixed(2)+(quand?' · misé le '+quand:'')+'</div></div>'
-      + '<div class="issue num">'+issue+'</div></div>';
+      + '<div class="issue num">'+issue+'</div>'
+      + (modifiable ? '<button class="btn discret" data-retirer="'+p.date+'" style="font-size:.75rem;padding:5px 12px;border:1px solid var(--bord-fort)">Retirer</button>' : '')
+      + '</div>';
   };
   const att = tous.filter(p=>etatPari(p)==="attente");
   const fin = tous.filter(p=>etatPari(p)!=="attente");
@@ -1453,11 +1644,16 @@ function rendreJoueursAdmin(){
     b.type="button";
     b.addEventListener("click", async ()=>{
       if(!confirm("Retirer « "+p+" » ? Ses paris disparaissent.")) return;
-      const frais = await casier.lire(CLE_JOUEURS,true,{})||{};
-      delete frais[p];
-      joueurs = frais;
-      await casier.ecrire(CLE_JOUEURS,frais,true);
-      note("Parieur retiré."); toutRendre(); rendreOrga();
+      if(enLigne){
+        const { error } = await sb.rpc("orga",{p_code:codeOrga, p_action:"retirer_joueur", p_data:{pseudo:p}});
+        if(error) return note(error.message, true);
+      }else{
+        const frais = await casier.lire(CLE_JOUEURS,true,{})||{};
+        delete frais[p];
+        joueurs = frais;
+        await casier.ecrire(CLE_JOUEURS,frais,true);
+      }
+      note("Parieur retiré."); await actualiser(true, true); rendreOrga();
     });
     l.appendChild(b);
     hote.appendChild(l);
@@ -1469,6 +1665,7 @@ function rendreListeAdmin(){
   hote.innerHTML = "";
   if(!etat.defis.length){ hote.innerHTML = '<p class="mot">Aucune épreuve. Ajoutez la première ci-dessous.</p>'; return; }
   [...etat.defis].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d=>{
+    const id = d.id;
     const b = el("div","bloc");
     const loc = new Date(d.date);
     const valeur = isNaN(loc)?"":new Date(loc.getTime()-loc.getTimezoneOffset()*60000).toISOString().slice(0,16);
@@ -1499,7 +1696,8 @@ function rendreListeAdmin(){
     fi.addEventListener("change", async ()=>{
       try{
         const url = await imageVers(fi.files[0], 640, 280, .74);
-        d.photo = url; ap.innerHTML = '<img src="'+url+'" alt="">';
+        const cible = defiPar(id); if(!cible) return;
+        cible.photo = url; ap.innerHTML = '<img src="'+url+'" alt="">';
         await sauverEtat(); note("Photo de l'épreuve enregistrée."); rendreDefis(); rendreCompteur();
       }catch(e){ note(e.message||"Photo refusée.", true); }
       fi.value="";
@@ -1507,7 +1705,8 @@ function rendreListeAdmin(){
     const br = el("button","btn discret","Retirer la photo");
     br.type="button";
     br.addEventListener("click", async ()=>{
-      d.photo = null; ap.innerHTML = "photo";
+      const cible = defiPar(id); if(!cible) return;
+      cible.photo = null; ap.innerHTML = "photo";
       await sauverEtat(); rendreDefis(); rendreCompteur();
     });
     zone.append(ap,bp,fi,br);
@@ -1517,22 +1716,28 @@ function rendreListeAdmin(){
     const bs = el("button","btn","Enregistrer");
     bs.type="button";
     bs.addEventListener("click", async ()=>{
+      const cible = defiPar(id);
+      if(!cible) return note("Épreuve introuvable, actualisez le poste.", true);
       const v = c => b.querySelector('[data-c="'+c+'"]').value;
-      d.sport = v("sport").trim() || d.sport;
-      const dt = v("date"); if(dt) d.date = new Date(dt).toISOString();
-      d.c1 = Math.max(1.01, parseFloat(v("c1"))||d.c1);
-      d.c2 = Math.max(1.01, parseFloat(v("c2"))||d.c2);
-      d.regle = v("regle").trim();
-      d.resultat = v("resultat") || null;
-      d.score = v("score").trim();
-      d.note = v("note").trim();
-      await sauverEtat(); note("Épreuve mise à jour."); toutRendre(); rendreOrga();
+      const c1 = parseFloat(String(v("c1")).replace(",","."));
+      const c2 = parseFloat(String(v("c2")).replace(",","."));
+      cible.sport = v("sport").trim() || cible.sport;
+      const dt = v("date"); if(dt) cible.date = new Date(dt).toISOString();
+      cible.c1 = isFinite(c1) ? Math.max(1.01, c1) : cible.c1;
+      cible.c2 = isFinite(c2) ? Math.max(1.01, c2) : cible.c2;
+      cible.regle = v("regle").trim();
+      cible.resultat = v("resultat") || null;
+      cible.score = v("score").trim();
+      cible.note = v("note").trim();
+      try{ await sauverEtat(); }catch(err){ return note(err.message, true); }
+      note("« "+cible.sport+" » enregistrée · cotes "+cible.c1.toFixed(2)+" / "+cible.c2.toFixed(2));
+      toutRendre(); rendreOrga();
     });
     const bd = el("button","btn danger","Supprimer");
     bd.type="button";
     bd.addEventListener("click", async ()=>{
       if(!confirm("Supprimer « "+d.sport+" » ? Les mises placées dessus seront remboursées.")) return;
-      etat.defis = etat.defis.filter(x=>x.id!==d.id);
+      etat.defis = etat.defis.filter(x=>x.id!==id);
       await sauverEtat(); note("Épreuve supprimée."); toutRendre(); rendreOrga();
     });
     actions.append(bs,bd);
@@ -1554,11 +1759,14 @@ function rendreOrga(){
 
 /* ---------- Cycle ---------- */
 function toutRendre(){
+  rendreEtatBase();
   rendrePortail(); rendreEnTete(); rendreCompteur();
   rendreDefis(); rendreTickets(); rendreClassement();
   rendreProfil(); rendreBarreOrga();
 }
-async function actualiser(silence){
+async function actualiser(silence, force){
+  // on ne recharge pas sous les doigts de l'organisateur : il perdrait sa saisie
+  if(silence && !force && $("#voile-orga").classList.contains("ouvert")) return;
   await charger();
   toutRendre();
   if(!silence){
@@ -1571,14 +1779,29 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   await charger();
   toutRendre();
   setInterval(rendreCompteur, 1000);
-  setInterval(()=>actualiser(true), 20000);
+  setInterval(()=>actualiser(true), enLigne ? 60000 : 20000);
   window.addEventListener("focus", ()=>actualiser(true));
+
+  if(enLigne){
+    let attente = null;
+    sb.channel("olympiades")
+      .on("postgres_changes", {event:"*", schema:"public"}, ()=>{
+        clearTimeout(attente);
+        attente = setTimeout(()=>actualiser(true), 350);   // on groupe les rafales
+      })
+      .subscribe();
+  }
 
   /* connexion */
   $("#btn-entrer").addEventListener("click", entrer);
   $("#l-pseudo").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#l-code").focus(); });
   $("#l-code").addEventListener("keydown", e=>{ if(e.key==="Enter") entrer(); });
   $("#l-code").addEventListener("input", e=>{ e.target.value = e.target.value.replace(/\D/g,"").slice(0,4); });
+
+  $("#tickets").addEventListener("click", e=>{
+    const b = e.target.closest("[data-retirer]");
+    if(b) retirerPari(Number(b.dataset.retirer));
+  });
 
   /* filtres */
   $("#onglets").addEventListener("click", e=>{
@@ -1614,13 +1837,13 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     toutRendre();
   });
   brancherPhoto("btn-photo-profil","fichier-profil","profil-apercu",200,200, async url=>{
-    await sauverMonJoueur(j=>{ j.photo = url; return j; });
-    note("Photo de profil enregistrée."); toutRendre();
+    try{ await majPhoto(url); }catch(e){ return note(e.message||"Enregistrement refusé.", true); }
+    note("Photo de profil enregistrée."); await actualiser(true, true);
   });
   $("#btn-retirer-photo").addEventListener("click", async ()=>{
-    await sauverMonJoueur(j=>{ j.photo = null; return j; });
+    try{ await majPhoto(null); }catch(e){ return note(e.message||"Retrait refusé.", true); }
     montrerApercu("profil-apercu", null);
-    note("Photo retirée."); toutRendre();
+    note("Photo retirée."); await actualiser(true, true);
   });
 
   /* poste des organisateurs */
@@ -1644,15 +1867,23 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   $("#btn-fermer-orga").addEventListener("click", ()=>$("#voile-orga").classList.remove("ouvert"));
   $("#voile-orga").addEventListener("click", e=>{ if(e.target.id==="voile-orga") e.currentTarget.classList.remove("ouvert"); });
   $("#btn-quitter-orga").addEventListener("click", async ()=>{
-    estOrga = false;
+    estOrga = false; codeOrga = null;
     await casier.ecrire(CLE_ORGA,{},false);
     $("#voile-orga").classList.remove("ouvert");
     note("Retour à l'espace joueur."); toutRendre();
   });
   $("#btn-deverrouiller").addEventListener("click", async ()=>{
-    if(hacher($("#code").value) !== empreinteCourante()) return note("Code incorrect.", true);
+    const saisi = $("#code").value;
+    if(enLigne){
+      const { error } = await sb.rpc("orga", {p_code:saisi, p_action:"ping", p_data:{}});
+      if(error) return note("Code incorrect.", true);
+      codeOrga = saisi;
+      await casier.ecrire(CLE_ORGA,{code:saisi},false);
+    }else{
+      if(hacher(saisi) !== empreinteCourante()) return note("Code incorrect.", true);
+      await casier.ecrire(CLE_ORGA,{empreinte:empreinteCourante()},false);
+    }
     estOrga = true;
-    await casier.ecrire(CLE_ORGA,{empreinte:empreinteCourante()},false);
     $("#code").value = "";
     $("#verrou").style.display="none"; $("#contenu-orga").style.display="block";
     rendreOrga(); rendreBarreOrga();
@@ -1675,6 +1906,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   $("#btn-resultat").addEventListener("click", async ()=>{
     const d = defiPar($("#r-defi").value);
     if(!d) return note("Choisissez une épreuve.", true);
+    if(d.resultat && !confirm("« "+d.sport+" » a déjà un résultat publié. Le remplacer ?")) return;
     d.resultat = $("#r-vainqueur").value;
     d.score = $("#r-score").value.trim();
     d.note  = $("#r-note").value.trim();
@@ -1708,20 +1940,32 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   /* parieurs */
   $("#btn-recrediter").addEventListener("click", async ()=>{
     if(!confirm("Tout le monde repart à 1 000 points. Paris et pronostics effacés. On y va ?")) return;
-    const frais = await casier.lire(CLE_JOUEURS,true,{})||{};
-    for(const p in frais){ frais[p].paris=[]; frais[p].votes={}; }
-    joueurs = frais;
-    await casier.ecrire(CLE_JOUEURS,frais,true);
-    note("Tout le monde est à 1 000 points."); toutRendre(); rendreOrga();
+    if(enLigne){
+      const { error } = await sb.rpc("orga",{p_code:codeOrga, p_action:"recrediter", p_data:{}});
+      if(error) return note(error.message, true);
+    }else{
+      const frais = await casier.lire(CLE_JOUEURS,true,{})||{};
+      for(const p in frais){ frais[p].paris=[]; frais[p].votes={}; }
+      joueurs = frais;
+      await casier.ecrire(CLE_JOUEURS,frais,true);
+    }
+    note("Tout le monde est à 1 000 points."); await actualiser(true, true); rendreOrga();
   });
 
   /* code et sauvegarde */
   $("#btn-changer-code").addEventListener("click", async ()=>{
     const c = $("#nouveau-code").value.trim();
     if(c.length < 4) return note("Quatre caractères minimum.", true);
-    etat.empreinte = hacher(c);
-    await sauverEtat();
-    await casier.ecrire(CLE_ORGA,{empreinte:etat.empreinte},false);
+    if(enLigne){
+      const { error } = await sb.rpc("orga",{p_code:codeOrga, p_action:"changer_code", p_data:{nouveau:c}});
+      if(error) return note(error.message, true);
+      codeOrga = c;
+      await casier.ecrire(CLE_ORGA,{code:c},false);
+    }else{
+      etat.empreinte = hacher(c);
+      await sauverEtat();
+      await casier.ecrire(CLE_ORGA,{empreinte:etat.empreinte},false);
+    }
     $("#nouveau-code").value = "";
     note("Code changé. L'ancien ne fonctionne plus.");
   });
