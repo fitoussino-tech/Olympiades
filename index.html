@@ -1355,7 +1355,7 @@ function rendreDefis(){
       const ligne = el("div","actions");
       [["1",n1],["2",n2]].forEach(([camp,nom])=>{
         const actif = monVote===camp;
-        const bp = el("button","btn "+(actif?"":"fantome"), (actif?"✓ ":"")+"Je vois "+nom);
+        const bp = el("button","btn "+(actif?"":"fantome"), (actif?"✓ ":"")+"Je vote "+nom);
         bp.type="button"; bp.style.flex="1"; bp.style.fontSize=".82rem";
         bp.addEventListener("click",()=>voter(d.id,camp));
         ligne.appendChild(bp);
