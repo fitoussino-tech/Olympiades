@@ -2,458 +2,576 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Noam vs Thibault — Le Duel</title>
-<meta name="description" content="Qui est le meilleur athlète ? Pronostique, mise tes points, et suis le duel défi par défi.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Olympiades — Noam vs Thibault</title>
+<meta name="description" content="Neuf épreuves, deux athlètes. Pronostiquez, misez vos points, suivez le classement.">
+<meta name="theme-color" content="#080B12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ---------- Jetons de design ---------- */
+/* ====================================================================
+   OLYMPIADES — feuille de style
+   Fond marine profond, surfaces empilées, deux couleurs d'athlète qui
+   portent l'information partout : bleu pour l'athlète 1, orange pour
+   l'athlète 2. Vert et rouge réservés aux gains et aux pertes.
+   ==================================================================== */
 :root{
-  --pelouse:#0B3A29;
-  --pelouse-2:#0E4732;
-  --craie:#F2F6EE;
-  --craie-faible:rgba(242,246,238,.45);
-  --craie-tres-faible:rgba(242,246,238,.16);
-  --noam:#4A86FF;
-  --thib:#FF6B1F;
-  --or:#FFC53D;
-  --encre:#052017;
-  --display:"Anton","Haettenschweiler","Arial Narrow",Impact,sans-serif;
-  --texte:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --fond:#080B12;
+  --surface:#101622;
+  --surface-2:#161E2C;
+  --surface-3:#1D2737;
+  --bord:#222C3E;
+  --bord-fort:#303D55;
+  --texte:#EAF0FA;
+  --faible:#8695AD;
+  --tres-faible:#5C6980;
+  --un:#4C8DFF;
+  --un-sourd:rgba(76,141,255,.14);
+  --deux:#FF7B3D;
+  --deux-sourd:rgba(255,123,61,.14);
+  --vert:#2FD48A;
+  --rouge:#FF5B5B;
+  --or:#FFC24B;
+  --rayon:14px;
+  --rayon-s:10px;
+  --ombre:0 18px 40px rgba(0,0,0,.45);
+  --ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --marque:"Archivo Black","Inter",sans-serif;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{
-  margin:0;
-  font-family:var(--texte);
-  color:var(--craie);
-  background-color:var(--pelouse);
-  background-image:repeating-linear-gradient(102deg,var(--pelouse) 0 70px,var(--pelouse-2) 70px 140px);
-  line-height:1.55;
+  margin:0;background:var(--fond);color:var(--texte);font-family:var(--ui);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 500px at 50% -8%,rgba(76,141,255,.10),transparent 70%);
+  background-repeat:no-repeat;
 }
-h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;line-height:.95;margin:0}
-p{margin:0 0 .6rem}
-button{font:inherit;color:inherit;cursor:pointer}
-input,select,textarea{font:inherit}
-a{color:var(--or)}
-:focus-visible{outline:2px solid var(--or);outline-offset:2px}
-.zone{max-width:1060px;margin:0 auto;padding:0 20px}
-.num{font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em;font-weight:700}
+p{margin:0 0 .7rem}
+a{color:inherit}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--un);outline-offset:2px;border-radius:6px}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.zone{max-width:1120px;margin:0 auto;padding:0 20px}
+.faible{color:var(--faible)}
 
-/* ---------- Le terrain (héros) ---------- */
-.terrain{
-  position:relative;
-  border-bottom:2px solid var(--craie-faible);
-  padding:26px 0 0;
+/* ---------- Boutons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:var(--rayon-s);padding:10px 16px;font-weight:600;font-size:.92rem;
+  background:var(--texte);color:#0A0E16;border:1px solid var(--texte);
+  transition:transform .06s,filter .15s,background .15s;white-space:nowrap;
 }
-.enseigne{text-align:center;padding:0 20px}
-.enseigne .sur-titre{
-  font-size:.82rem;letter-spacing:.16em;color:var(--craie-faible);margin:0 0 .5rem;
-}
-.enseigne h1{font-size:clamp(2.1rem,7vw,4.2rem)}
-.enseigne h1 .petit{display:block;font-size:.34em;letter-spacing:.06em;color:var(--or);margin:.45rem 0}
+.btn:hover{filter:brightness(.92)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.fantome{background:transparent;color:var(--texte);border-color:var(--bord-fort)}
+.btn.fantome:hover{background:var(--surface-3);filter:none}
+.btn.discret{background:transparent;color:var(--faible);border-color:transparent;padding:8px 10px}
+.btn.discret:hover{color:var(--texte);background:var(--surface-2)}
+.btn.danger{background:transparent;color:var(--rouge);border-color:rgba(255,91,91,.35)}
+.btn.danger:hover{background:rgba(255,91,91,.1);filter:none}
+.btn.large{width:100%;padding:13px;font-size:1rem}
 
-.tableau{
-  position:relative;
-  margin:22px auto 0;
-  max-width:920px;
-  border:2px solid var(--craie-faible);
-  border-bottom:none;
-  border-radius:14px 14px 0 0;
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  padding:26px 16px 30px;
-  background:radial-gradient(120% 130% at 50% 0%,rgba(255,255,255,.07),transparent 60%);
-}
-/* ligne médiane + rond central, comme sur un terrain */
-.tableau::before{
-  content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;
-  background:var(--craie-tres-faible);
-}
-.tableau::after{
-  content:"";position:absolute;top:50%;left:50%;width:118px;height:118px;
-  transform:translate(-50%,-50%);border:2px solid var(--craie-tres-faible);border-radius:50%;
-}
-.athlete{text-align:center;position:relative;z-index:1}
-.pastille{
-  width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
-  margin:0 auto 10px;font-family:var(--display);font-size:2rem;color:var(--encre);
-}
-.athlete.n .pastille{background:var(--noam)}
-.athlete.t .pastille{background:var(--thib)}
-.athlete .nom{font-family:var(--display);font-size:clamp(1.3rem,4.4vw,2.2rem)}
-.athlete .points{font-family:var(--display);font-size:clamp(3rem,13vw,5.6rem);line-height:.85;margin-top:4px}
-.athlete.n .points{color:var(--noam)}
-.athlete.t .points{color:var(--thib)}
-.athlete .sous{font-size:.8rem;color:var(--craie-faible)}
-.separateur{font-family:var(--display);font-size:1.1rem;color:var(--craie-faible);padding:0 6px;position:relative;z-index:1}
-
-.chrono{
-  max-width:920px;margin:0 auto;
-  border:2px solid var(--craie-faible);border-top:none;border-radius:0 0 14px 14px;
-  background:rgba(5,32,23,.55);
-  padding:16px;text-align:center;
-}
-.chrono .libelle{font-size:.85rem;color:var(--craie-faible);margin-bottom:8px}
-.chrono .libelle b{color:var(--craie);font-weight:600}
-.pendule{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.pendule div{min-width:66px}
-.pendule .v{font-family:var(--display);font-size:2.1rem;line-height:1;color:var(--or)}
-.pendule .u{font-size:.7rem;color:var(--craie-faible)}
-.en-direct{
-  display:inline-block;font-family:var(--display);font-size:1.6rem;color:var(--or);
-}
-.en-direct .pastille-live{
-  display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--thib);
-  margin-right:8px;animation:battement 1.4s infinite;
-}
-@keyframes battement{0%,100%{opacity:1}50%{opacity:.25}}
-
-/* ---------- Bandeau compte ---------- */
-.bandeau{
-  border-bottom:2px solid var(--craie-faible);
-  background:rgba(5,32,23,.7);
-  position:sticky;top:0;z-index:30;
-  backdrop-filter:blur(6px);
-}
-.bandeau .zone{display:flex;gap:14px;align-items:center;justify-content:space-between;padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
-.solde{display:flex;align-items:baseline;gap:8px}
-.solde .v{font-family:var(--display);font-size:1.8rem;color:var(--or);line-height:1}
-.solde .qui{font-size:.9rem;color:var(--craie-faible)}
+/* ---------- Champs ---------- */
 .champ{
-  background:transparent;border:2px solid var(--craie-faible);border-radius:8px;
-  color:var(--craie);padding:8px 10px;
+  width:100%;background:var(--fond);border:1px solid var(--bord-fort);border-radius:var(--rayon-s);
+  padding:11px 13px;color:var(--texte);transition:border-color .15s;
 }
-.champ::placeholder{color:rgba(242,246,238,.4)}
-.bouton{
-  border:2px solid var(--craie);background:var(--craie);color:var(--encre);
-  border-radius:8px;padding:8px 14px;font-weight:700;
+.champ:focus{outline:none;border-color:var(--un)}
+.champ::placeholder{color:var(--tres-faible)}
+select.champ{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--faible) 50%),linear-gradient(135deg,var(--faible) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}
+.etiq{display:block;font-size:.75rem;font-weight:600;color:var(--faible);margin-bottom:6px}
+
+/* ---------- Pastilles d'état ---------- */
+.pil{
+  display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;
+  padding:4px 10px;border-radius:999px;border:1px solid;letter-spacing:.01em;
 }
-.bouton:hover{background:var(--or);border-color:var(--or)}
-.bouton.creux{background:transparent;color:var(--craie);border-color:var(--craie-faible)}
-.bouton.creux:hover{background:rgba(242,246,238,.1);border-color:var(--craie)}
-.bouton:disabled{opacity:.4;cursor:not-allowed}
+.pil.ouvert{color:var(--vert);border-color:rgba(47,212,138,.3);background:rgba(47,212,138,.09)}
+.pil.direct{color:var(--or);border-color:rgba(255,194,75,.3);background:rgba(255,194,75,.09)}
+.pil.clos{color:var(--faible);border-color:var(--bord-fort)}
+.point{width:6px;height:6px;border-radius:50%;background:currentColor}
+.pil.direct .point{animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ---------- Avatars ---------- */
+.av{
+  border-radius:50%;object-fit:cover;background:var(--surface-3);flex:none;
+  display:grid;place-items:center;font-weight:700;color:var(--faible);overflow:hidden;
+}
+.av.s{width:26px;height:26px;font-size:.7rem}
+.av.m{width:38px;height:38px;font-size:.85rem}
+.av img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- Barre de navigation ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;background:rgba(8,11,18,.85);
+  backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--bord);
+}
+.topbar .zone{display:flex;align-items:center;gap:22px;height:62px}
+.marque{font-family:var(--marque);font-size:1.02rem;letter-spacing:.01em;text-decoration:none}
+.marque span{color:var(--un)}
+.liens{display:flex;gap:4px;margin-left:auto}
+.liens a{
+  text-decoration:none;color:var(--faible);font-size:.88rem;font-weight:500;
+  padding:7px 12px;border-radius:var(--rayon-s);
+}
+.liens a:hover{color:var(--texte);background:var(--surface-2)}
+.portefeuille{
+  display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1px solid var(--bord);
+  border-radius:999px;background:var(--surface);cursor:pointer;
+}
+.portefeuille:hover{border-color:var(--bord-fort)}
+.portefeuille .pts{font-weight:700;font-size:.95rem}
+.portefeuille .pts small{color:var(--faible);font-weight:500;margin-left:3px;font-size:.72rem}
+
+/* ---------- Tableau d'affichage ---------- */
+.affiche{padding:34px 0 8px}
+.carte-score{
+  background:linear-gradient(180deg,var(--surface-2),var(--surface));
+  border:1px solid var(--bord);border-radius:20px;overflow:hidden;box-shadow:var(--ombre);
+}
+.score-haut{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:30px 26px 26px}
+.cote-athlete{display:flex;align-items:center;gap:16px}
+.cote-athlete.droite{flex-direction:row-reverse;text-align:right}
+.portrait{
+  width:82px;height:82px;border-radius:50%;overflow:hidden;flex:none;
+  background:var(--surface-3);display:grid;place-items:center;
+  font-family:var(--marque);font-size:1.8rem;color:var(--faible);
+  border:2px solid var(--bord-fort);
+}
+.portrait.un{border-color:var(--un)}
+.portrait.deux{border-color:var(--deux)}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.cote-athlete .nom{font-size:1.15rem;font-weight:700}
+.cote-athlete .chiffre{font-family:var(--marque);font-size:3.4rem;line-height:.95;letter-spacing:-.02em}
+.cote-athlete.un .chiffre{color:var(--un)}
+.cote-athlete.deux .chiffre{color:var(--deux)}
+.cote-athlete .mention{font-size:.76rem;color:var(--tres-faible)}
+.milieu-score{text-align:center;color:var(--tres-faible);font-size:.8rem;font-weight:600}
+.milieu-score .vs{font-family:var(--marque);font-size:1rem;color:var(--faible)}
+.jauge-duel{height:5px;border-radius:999px;background:var(--surface-3);display:flex;overflow:hidden;margin-top:6px;width:74px}
+.jauge-duel i{display:block;height:100%}
+
+.score-bas{
+  border-top:1px solid var(--bord);padding:14px 26px;display:flex;
+  align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(8,11,18,.4);
+}
+.prochain{display:flex;align-items:center;gap:12px;min-width:0}
+.prochain .vignette{width:44px;height:44px;border-radius:var(--rayon-s);object-fit:cover;background:var(--surface-3);flex:none}
+.prochain .quoi{font-weight:600;font-size:.95rem}
+.prochain .quand{font-size:.78rem;color:var(--faible)}
+.compteur{display:flex;gap:6px}
+.compteur div{
+  min-width:52px;text-align:center;background:var(--surface-3);border:1px solid var(--bord);
+  border-radius:var(--rayon-s);padding:6px 8px;
+}
+.compteur .v{font-weight:700;font-size:1.1rem}
+.compteur .u{font-size:.62rem;color:var(--tres-faible);text-transform:lowercase}
 
 /* ---------- Sections ---------- */
-section{padding:44px 0}
-.titre-section{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;flex-wrap:wrap}
-.titre-section h2{font-size:clamp(1.6rem,5vw,2.4rem)}
-.titre-section .aide{font-size:.88rem;color:var(--craie-faible)}
+section{padding:38px 0}
+.tete-section{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.tete-section h2{font-size:1.45rem}
+.tete-section .sous{font-size:.88rem;color:var(--faible)}
+.onglets{display:flex;gap:4px;margin-left:auto;background:var(--surface);border:1px solid var(--bord);border-radius:999px;padding:4px}
+.onglets button{padding:6px 14px;border-radius:999px;font-size:.84rem;font-weight:600;color:var(--faible)}
+.onglets button[aria-selected="true"]{background:var(--surface-3);color:var(--texte)}
 
-/* ---------- Défis ---------- */
-.liste-defis{display:grid;gap:18px}
+/* ---------- Cartes de défi ---------- */
+.grille-defis{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
 .defi{
-  border:2px solid var(--craie-faible);border-radius:12px;
-  background:rgba(5,32,23,.5);
-  padding:18px;
+  background:var(--surface);border:1px solid var(--bord);border-radius:var(--rayon);
+  overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s;
 }
-.defi.termine{opacity:.92;border-style:dashed}
-.defi-tete{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-.defi-tete h3{font-size:1.5rem}
-.defi .quand{font-size:.85rem;color:var(--craie-faible);white-space:nowrap}
-.etiquette{
-  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;
-  border:1.5px solid currentColor;border-radius:999px;padding:2px 9px;
+.defi:hover{border-color:var(--bord-fort)}
+.defi.fini{opacity:.9}
+.banniere{position:relative;aspect-ratio:16/7;background:var(--surface-3);overflow:hidden}
+.banniere img{width:100%;height:100%;object-fit:cover}
+.banniere::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,11,18,.15),rgba(16,22,34,.95))}
+.banniere .pil{position:absolute;top:10px;right:10px;z-index:2;background:rgba(8,11,18,.7);backdrop-filter:blur(6px)}
+.banniere .titre-sur{position:absolute;left:14px;right:14px;bottom:10px;z-index:2}
+.banniere .titre-sur h3{font-size:1.12rem}
+.sans-photo{padding:14px 16px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.sans-photo h3{font-size:1.08rem}
+.corps{padding:14px 16px 16px;display:flex;flex-direction:column;gap:13px;flex:1}
+.meta{display:flex;align-items:center;gap:8px;font-size:.79rem;color:var(--faible);flex-wrap:wrap}
+.meta .sep{width:3px;height:3px;border-radius:50%;background:var(--tres-faible)}
+.regle{font-size:.84rem;color:var(--faible);margin:0}
+
+.paire{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choix{
+  border:1px solid var(--bord-fort);border-radius:var(--rayon-s);padding:11px 12px;text-align:left;
+  background:var(--surface-2);transition:border-color .12s,background .12s;position:relative;overflow:hidden;
 }
-.etiquette.ouvert{color:var(--or)}
-.etiquette.ferme{color:var(--craie-faible)}
-.etiquette.direct{color:var(--thib)}
-.regle{font-size:.92rem;color:rgba(242,246,238,.72);margin:.5rem 0 0}
-
-.duel{display:grid;grid-template-columns:1fr 44px 1fr;gap:8px;align-items:stretch;margin-top:14px}
-.cote{
-  border:2px solid var(--craie-tres-faible);background:transparent;border-radius:10px;
-  padding:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;
-  transition:border-color .15s,background .15s;
-}
-.cote .qui{font-family:var(--display);font-size:1.15rem}
-.cote .val{font-family:var(--display);font-size:1.7rem;line-height:1}
-.cote.n:hover,.cote.n[aria-pressed="true"]{border-color:var(--noam);background:rgba(74,134,255,.14)}
-.cote.n .val{color:var(--noam)}
-.cote.t:hover,.cote.t[aria-pressed="true"]{border-color:var(--thib);background:rgba(255,107,31,.14)}
-.cote.t .val{color:var(--thib)}
-.cote[disabled]{cursor:default;opacity:.75}
-.cote.gagnant{border-color:var(--or);background:rgba(255,197,61,.12)}
-.milieu{display:grid;place-items:center;font-family:var(--display);color:var(--craie-faible);font-size:.95rem}
-
-.sondage{margin-top:14px}
-.sondage .barre{height:12px;border:1.5px solid var(--craie-tres-faible);border-radius:999px;overflow:hidden;display:flex;background:rgba(0,0,0,.25)}
-.sondage .barre i{display:block;height:100%}
-.sondage .barre .bn{background:var(--noam)}
-.sondage .barre .bt{background:var(--thib)}
-.sondage .legende{display:flex;justify-content:space-between;font-size:.8rem;color:var(--craie-faible);margin-top:5px}
-
-.mise{margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.mise input{width:120px}
-.jetons{display:flex;gap:6px}
-.jeton{border:1.5px solid var(--craie-tres-faible);background:transparent;border-radius:999px;padding:4px 11px;font-size:.82rem}
-.jeton:hover{border-color:var(--or);color:var(--or)}
-.retour{font-size:.88rem;margin-top:10px;color:rgba(242,246,238,.8)}
-.retour b{color:var(--or)}
-.ticket{
-  margin-top:12px;border-left:4px solid var(--or);background:rgba(255,197,61,.09);
-  padding:9px 12px;font-size:.9rem;border-radius:0 8px 8px 0;
-}
-.ticket.perdu{border-color:var(--craie-faible);background:rgba(242,246,238,.06);color:var(--craie-faible)}
-.ticket.gagne{border-color:var(--or)}
-.verdict{
-  margin-top:14px;font-family:var(--display);font-size:1.25rem;
-  border-top:2px solid var(--craie-tres-faible);padding-top:12px;
-}
-.verdict.n{color:var(--noam)}
-.verdict.t{color:var(--thib)}
-.verdict.nul{color:var(--craie-faible)}
-
-/* ---------- Classement ---------- */
-table{width:100%;border-collapse:collapse;font-size:.94rem}
-th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--craie-tres-faible)}
-th{font-size:.78rem;color:var(--craie-faible);font-weight:600}
-td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
-tr.moi td{background:rgba(255,197,61,.1)}
-.rang{font-family:var(--display);font-size:1.1rem;color:var(--craie-faible);width:2.4rem}
-tr:nth-child(1) .rang{color:var(--or)}
-
-.vide{
-  border:2px dashed var(--craie-tres-faible);border-radius:12px;padding:26px;text-align:center;
-  color:var(--craie-faible);
+.choix .haut{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.choix .qui{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.choix .bas{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.choix .cote{font-weight:800;font-size:1.32rem}
+.choix .proba{font-size:.74rem;color:var(--faible)}
+.choix.un:hover:not(:disabled),.choix.un[aria-pressed="true"]{border-color:var(--un);background:var(--un-sourd)}
+.choix.un .cote{color:var(--un)}
+.choix.deux:hover:not(:disabled),.choix.deux[aria-pressed="true"]{border-color:var(--deux);background:var(--deux-sourd)}
+.choix.deux .cote{color:var(--deux)}
+.choix:disabled{cursor:default;opacity:.6}
+.choix.vainqueur{border-color:var(--vert);background:rgba(47,212,138,.1)}
+.choix.vainqueur::before{
+  content:"gagnant";position:absolute;top:0;right:0;font-size:.6rem;font-weight:700;color:#07130D;
+  background:var(--vert);padding:2px 7px;border-bottom-left-radius:8px;
 }
 
-/* ---------- Pied ---------- */
-footer{border-top:2px solid var(--craie-faible);padding:26px 0 40px;font-size:.85rem;color:var(--craie-faible)}
-footer .zone{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
-
-/* ---------- Page d'entrée ---------- */
-.accueil{
-  position:fixed;inset:0;z-index:70;display:none;overflow:auto;padding:24px 16px;
-  background-color:var(--pelouse);
-  background-image:repeating-linear-gradient(102deg,var(--pelouse) 0 70px,var(--pelouse-2) 70px 140px);
+.opinion{display:flex;flex-direction:column;gap:6px}
+.opinion .rail{height:6px;border-radius:999px;background:var(--surface-3);display:flex;overflow:hidden}
+.opinion .rail i{display:block;height:100%}
+.opinion .mots{display:flex;justify-content:space-between;font-size:.75rem;color:var(--faible)}
+.gens{display:flex;gap:6px;flex-wrap:wrap}
+.gens .col{flex:1;min-width:0}
+.gens h5{font-size:.7rem;font-weight:600;color:var(--tres-faible);margin:0 0 6px}
+.jetons-gens{display:flex;flex-wrap:wrap;gap:4px}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;border:1px solid var(--bord-fort);border-radius:999px;
+  padding:2px 8px 2px 3px;font-size:.74rem;max-width:100%;
 }
-.accueil.visible{display:block}
-.carte-accueil{
-  max-width:470px;margin:5vh auto 40px;padding:28px 26px 26px;
-  border:2px solid var(--craie-faible);border-radius:16px;background:rgba(5,32,23,.62);
+.tag.un{border-color:rgba(76,141,255,.4);background:var(--un-sourd)}
+.tag.deux{border-color:rgba(255,123,61,.4);background:var(--deux-sourd)}
+.tag b{color:var(--or);font-weight:700}
+.tag .nomtag{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px}
+.resultat-bloc{
+  border-top:1px solid var(--bord);padding-top:12px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;flex-wrap:wrap;
 }
-.carte-accueil h1{font-size:clamp(1.9rem,8vw,2.8rem);margin-bottom:14px}
-.carte-accueil .sur-titre{font-size:.78rem;letter-spacing:.14em;color:var(--craie-faible);margin:0 0 .5rem}
-.carte-accueil .pitch{color:rgba(242,246,238,.82)}
-.regles-accueil{list-style:none;padding:0;margin:18px 0 22px;display:grid;gap:8px}
-.regles-accueil li{padding-left:18px;position:relative;font-size:.92rem;color:rgba(242,246,238,.85)}
-.regles-accueil li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--or)}
-.regles-accueil b{color:var(--or)}
-.champs-accueil{display:grid;gap:12px;grid-template-columns:1fr 118px}
-.champs-accueil label{display:block;font-size:.78rem;color:var(--craie-faible);margin-bottom:4px}
-.champs-accueil .champ{width:100%}
-.bouton.grand{width:100%;padding:13px;font-size:1.05rem;margin-top:16px}
-.erreur{color:var(--thib);font-size:.88rem;min-height:1.2em;margin:.6rem 0 0}
-.carte-accueil .mot{margin-top:10px;font-size:.82rem}
-@media (max-width:420px){.champs-accueil{grid-template-columns:1fr}}
+.resultat-bloc .verdict{font-weight:700;font-size:.95rem}
+.resultat-bloc .marque-score{
+  font-weight:800;font-size:1.05rem;padding:3px 10px;border-radius:var(--rayon-s);
+  background:var(--surface-3);border:1px solid var(--bord-fort);
+}
+.mon-ticket{
+  border:1px dashed var(--bord-fort);border-radius:var(--rayon-s);padding:8px 11px;
+  font-size:.8rem;color:var(--faible);display:flex;justify-content:space-between;gap:10px;
+}
+.mon-ticket b{color:var(--texte)}
 
-/* ---------- Qui a pronostiqué quoi ---------- */
-.camps{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;font-size:.85rem}
-.camps h4{font-family:var(--texte);font-size:.76rem;font-weight:600;color:var(--craie-faible);margin:0 0 6px}
-.puces{display:flex;flex-wrap:wrap;gap:5px}
-.puce{border:1.5px solid;border-radius:999px;padding:2px 9px;font-size:.79rem;white-space:nowrap}
-.puce.n{color:var(--noam);border-color:rgba(74,134,255,.55)}
-.puce.t{color:var(--thib);border-color:rgba(255,107,31,.55)}
-.puce b{color:var(--or);font-weight:600}
-.puce.moi{background:rgba(255,197,61,.14)}
-.camps .aucun{color:var(--craie-faible)}
+/* ---------- Panier de pari ---------- */
+.panier{
+  position:fixed;right:22px;bottom:22px;width:340px;max-width:calc(100vw - 32px);z-index:50;
+  background:var(--surface-2);border:1px solid var(--bord-fort);border-radius:var(--rayon);
+  box-shadow:var(--ombre);display:none;overflow:hidden;
+}
+.panier.ouvert{display:block}
+.panier-tete{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--bord)}
+.panier-tete strong{font-size:.9rem}
+.panier-corps{padding:15px}
+.panier .sel{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.panier .sel .bulle{width:36px;height:36px;border-radius:var(--rayon-s);display:grid;place-items:center;font-weight:800;flex:none}
+.panier .sel.un .bulle{background:var(--un-sourd);color:var(--un)}
+.panier .sel.deux .bulle{background:var(--deux-sourd);color:var(--deux)}
+.panier .sel .quoi{font-weight:600;font-size:.9rem;line-height:1.25}
+.panier .sel .sur{font-size:.76rem;color:var(--faible)}
+.rapides{display:flex;gap:6px;margin:9px 0 13px}
+.rapides button{flex:1;border:1px solid var(--bord-fort);border-radius:8px;padding:6px;font-size:.78rem;color:var(--faible)}
+.rapides button:hover{border-color:var(--un);color:var(--texte)}
+.retour-ligne{display:flex;justify-content:space-between;font-size:.85rem;padding:9px 0;border-top:1px solid var(--bord)}
+.retour-ligne .gain{font-weight:700;color:var(--vert)}
 
 /* ---------- Mes paris ---------- */
-.resume{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin-bottom:18px}
-.stat{border:2px solid var(--craie-tres-faible);border-radius:10px;padding:12px 14px}
-.stat .v{font-family:var(--display);font-size:1.75rem;line-height:1}
-.stat .u{font-size:.76rem;color:var(--craie-faible);margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--bord);border-radius:var(--rayon);padding:15px 17px}
+.stat .v{font-size:1.55rem;font-weight:800;line-height:1.1}
+.stat .u{font-size:.76rem;color:var(--faible);margin-top:3px}
+.stat.vert .v{color:var(--vert)}
+.stat.rouge .v{color:var(--rouge)}
 .stat.or .v{color:var(--or)}
-.stat.vert .v{color:#5FD39B}
-.stat.rouge .v{color:var(--thib)}
-.groupe-tickets h3{font-family:var(--texte);font-size:.8rem;font-weight:600;color:var(--craie-faible);margin:18px 0 8px}
-.slip{
-  border:2px solid var(--craie-tres-faible);border-left-width:5px;border-radius:0 10px 10px 0;
-  padding:11px 14px;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;
+.groupe h3{font-size:.78rem;font-weight:600;color:var(--tres-faible);margin:20px 0 9px}
+.ticket{
+  display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--bord);
+  border-left:3px solid var(--bord-fort);border-radius:var(--rayon-s);padding:12px 15px;margin-bottom:8px;
 }
-.slip.attente{border-left-color:var(--or)}
-.slip.gagne{border-left-color:#5FD39B;background:rgba(95,211,155,.07)}
-.slip.perdu{border-left-color:var(--craie-faible);opacity:.72}
-.slip.rembourse{border-left-color:var(--craie-faible)}
-.slip .quoi{font-weight:600}
-.slip .detail{font-size:.85rem;color:rgba(242,246,238,.7)}
-.slip .issue{font-family:var(--display);font-size:1.25rem;white-space:nowrap}
-.slip.gagne .issue{color:#5FD39B}
-.slip.attente .issue{color:var(--or)}
-.slip.perdu .issue{color:var(--craie-faible)}
+.ticket.attente{border-left-color:var(--or)}
+.ticket.gagne{border-left-color:var(--vert)}
+.ticket.perdu{border-left-color:var(--bord-fort);opacity:.65}
+.ticket .info{flex:1;min-width:0}
+.ticket .quoi{font-weight:600;font-size:.92rem}
+.ticket .detail{font-size:.78rem;color:var(--faible)}
+.ticket .issue{font-weight:800;font-size:1.02rem;white-space:nowrap}
+.ticket.gagne .issue{color:var(--vert)}
+.ticket.attente .issue{color:var(--or)}
+.ticket.perdu .issue{color:var(--faible)}
 
-/* ---------- Navigation rapide ---------- */
-.nav-rapide{display:flex;gap:16px;font-size:.88rem}
-.nav-rapide a{color:var(--craie-faible);text-decoration:none;border-bottom:1.5px solid transparent;padding-bottom:2px}
-.nav-rapide a:hover{color:var(--craie);border-bottom-color:var(--or)}
-@media (max-width:620px){.nav-rapide{order:3;width:100%;justify-content:space-between}}
+/* ---------- Classement ---------- */
+.classement{background:var(--surface);border:1px solid var(--bord);border-radius:var(--rayon);overflow:hidden}
+.ligne-c{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--bord)}
+.ligne-c:last-child{border-bottom:none}
+.ligne-c.moi{background:rgba(76,141,255,.07)}
+.ligne-c .rang{width:26px;font-weight:800;color:var(--tres-faible);font-size:.95rem;text-align:center;flex:none}
+.ligne-c.podium1 .rang{color:var(--or)}
+.ligne-c.podium2 .rang,.ligne-c.podium3 .rang{color:var(--faible)}
+.ligne-c .qui{flex:1;min-width:0}
+.ligne-c .pseudo{font-weight:600;font-size:.93rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ligne-c .sous{font-size:.75rem;color:var(--faible)}
+.ligne-c .solde{font-weight:800;font-size:1.02rem}
+.ligne-c .delta{font-size:.75rem;text-align:right}
+.delta.plus{color:var(--vert)}
+.delta.moins{color:var(--rouge)}
 
-/* ---------- Bandeau du mode organisateur ---------- */
-.barre-orga{display:none;background:var(--or);color:var(--encre);font-weight:600;font-size:.9rem}
-.barre-orga.visible{display:block}
-.barre-orga .zone{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-top:9px;padding-bottom:9px}
-.barre-orga .bouton{border-color:var(--encre);background:var(--encre);color:var(--or);padding:5px 12px}
-.barre-orga .bouton:hover{background:#000;border-color:#000;color:var(--or)}
-.barre-orga .bouton.creux{background:transparent;color:var(--encre);border-color:rgba(5,32,23,.45)}
-.barre-orga .bouton.creux:hover{background:rgba(5,32,23,.12);color:var(--encre)}
-
-/* ---------- Fenêtre organisateurs ---------- */
-.voile{
-  position:fixed;inset:0;background:rgba(2,15,11,.82);z-index:90;
-  display:none;padding:24px 14px;overflow:auto;
+/* ---------- États vides ---------- */
+.vide{
+  border:1px dashed var(--bord-fort);border-radius:var(--rayon);padding:34px 22px;text-align:center;color:var(--faible);
 }
+.vide strong{display:block;color:var(--texte);margin-bottom:5px;font-size:1rem}
+
+/* ---------- Page de connexion ---------- */
+.portail{
+  position:fixed;inset:0;z-index:70;display:none;overflow:auto;padding:24px 18px;background:var(--fond);
+  background-image:radial-gradient(800px 460px at 50% 0%,rgba(76,141,255,.14),transparent 68%),
+                   radial-gradient(600px 400px at 88% 100%,rgba(255,123,61,.10),transparent 70%);
+}
+.portail.visible{display:block}
+.portail-grille{
+  max-width:960px;margin:0 auto;min-height:calc(100vh - 48px);
+  display:grid;grid-template-columns:1fr 400px;align-items:center;gap:50px;
+}
+.portail-gauche .marque{font-size:1.05rem;text-decoration:none;display:inline-block;margin-bottom:28px}
+.portail h1{font-size:clamp(2.2rem,5.2vw,3.4rem);letter-spacing:-.035em;margin-bottom:14px}
+.portail h1 em{font-style:normal;color:var(--faible);font-weight:600;font-size:.4em;display:block;letter-spacing:0;margin:10px 0}
+.portail .accroche{color:var(--faible);font-size:1.02rem;max-width:44ch}
+.duo{display:flex;align-items:center;gap:18px;margin:30px 0}
+.duo .p{display:flex;align-items:center;gap:11px}
+.duo .portrait{width:54px;height:54px;font-size:1.2rem}
+.duo .p b{font-size:.98rem}
+.duo .contre{font-family:var(--marque);color:var(--tres-faible);font-size:.8rem}
+.points-cles{display:flex;gap:26px;flex-wrap:wrap;margin-top:6px}
+.points-cles div .g{font-size:1.5rem;font-weight:800}
+.points-cles div .p{font-size:.78rem;color:var(--faible)}
+.boite-connexion{
+  background:var(--surface);border:1px solid var(--bord);border-radius:18px;padding:28px 26px;box-shadow:var(--ombre);
+}
+.boite-connexion h2{font-size:1.2rem;margin-bottom:5px}
+.boite-connexion .intro{font-size:.86rem;color:var(--faible);margin-bottom:20px}
+.boite-connexion .champ{margin-bottom:14px}
+.aide-champ{font-size:.76rem;color:var(--tres-faible);margin:-8px 0 16px}
+.err{color:var(--rouge);font-size:.84rem;min-height:1.2em;margin-top:10px}
+@media (max-width:860px){
+  .portail-grille{grid-template-columns:1fr;gap:26px;padding:20px 0 40px;min-height:0}
+  .portail-gauche{text-align:left}
+  .duo{margin:22px 0}
+}
+
+/* ---------- Fenêtres ---------- */
+.voile{position:fixed;inset:0;background:rgba(4,6,11,.78);backdrop-filter:blur(3px);z-index:90;display:none;overflow:auto;padding:26px 16px}
 .voile.ouvert{display:block}
-.fenetre{
-  max-width:820px;margin:0 auto;background:var(--pelouse-2);border:2px solid var(--craie-faible);
-  border-radius:14px;padding:20px;
+.modale{
+  max-width:860px;margin:0 auto 40px;background:var(--surface);border:1px solid var(--bord);
+  border-radius:18px;padding:24px;box-shadow:var(--ombre);
 }
-.fenetre h2{font-size:1.7rem;margin-bottom:4px}
-.grille-admin{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:8px}
-.grille-admin label{display:block;font-size:.75rem;color:var(--craie-faible);margin-bottom:3px}
-.grille-admin .champ,.grille-admin select{width:100%}
-select.champ{background:var(--pelouse-2)}
-.ligne-admin{border:1.5px solid var(--craie-tres-faible);border-radius:10px;padding:12px;margin-bottom:10px}
-.ligne-admin .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.danger{border-color:var(--thib);color:var(--thib)}
-.danger:hover{background:rgba(255,107,31,.15);border-color:var(--thib);color:var(--thib)}
-.mot{font-size:.85rem;color:var(--craie-faible)}
+.modale.etroite{max-width:430px}
+.modale-tete{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.modale-tete h2{font-size:1.3rem}
+.modale-tete p{font-size:.85rem;color:var(--faible);margin:4px 0 0}
+.bloc{background:var(--surface-2);border:1px solid var(--bord);border-radius:var(--rayon);padding:16px;margin-bottom:14px}
+.bloc > strong{display:block;margin-bottom:12px;font-size:.95rem}
+.rangee{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px}
+.rangee.large{grid-template-columns:1fr}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.mot{font-size:.8rem;color:var(--faible);margin:0 0 12px}
 
-.messages{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:80;display:grid;gap:8px;width:min(420px,92vw)}
-.message{
-  background:var(--craie);color:var(--encre);border-radius:10px;padding:10px 14px;font-weight:600;
-  box-shadow:0 8px 20px rgba(0,0,0,.35);
+/* ---------- Téléversement de photo ---------- */
+.photo-champ{display:flex;align-items:center;gap:14px}
+.apercu{
+  width:76px;height:52px;border-radius:var(--rayon-s);background:var(--surface-3);border:1px solid var(--bord-fort);
+  object-fit:cover;flex:none;display:grid;place-items:center;color:var(--tres-faible);font-size:.68rem;text-align:center;overflow:hidden;
 }
-.message.ko{background:var(--thib);color:#fff}
+.apercu.rond{width:60px;height:60px;border-radius:50%}
+.apercu img{width:100%;height:100%;object-fit:cover}
+input[type=file]{display:none}
 
-@media (max-width:640px){
-  .tableau{grid-template-columns:1fr auto 1fr;padding:20px 8px 24px}
-  .tableau::after{width:84px;height:84px}
-  .duel{grid-template-columns:1fr;gap:6px}
-  .milieu{padding:2px 0}
-  .cote{justify-content:space-between}
+/* ---------- Bandeau organisateur ---------- */
+.barre-orga{display:none;background:var(--or);color:#120C00;font-weight:600;font-size:.86rem}
+.barre-orga.visible{display:block}
+.barre-orga .zone{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:9px;padding-bottom:9px;flex-wrap:wrap}
+.barre-orga .btn{background:#120C00;color:var(--or);border-color:#120C00;padding:6px 13px}
+.barre-orga .btn.fantome{background:transparent;color:#120C00;border-color:rgba(18,12,0,.35)}
+
+/* ---------- Tableaux admin ---------- */
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--bord)}
+th{font-size:.72rem;color:var(--faible);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---------- Notifications ---------- */
+.notes{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:120;display:grid;gap:8px;width:min(400px,92vw)}
+.note{
+  background:var(--surface-3);border:1px solid var(--bord-fort);color:var(--texte);
+  border-radius:var(--rayon-s);padding:12px 15px;font-size:.88rem;font-weight:500;box-shadow:var(--ombre);
+  border-left:3px solid var(--vert);
 }
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
+.note.ko{border-left-color:var(--rouge)}
+
+/* ---------- Pied ---------- */
+footer{border-top:1px solid var(--bord);padding:26px 0 46px;font-size:.8rem;color:var(--tres-faible);margin-top:20px}
+footer .zone{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+@media (max-width:720px){
+  .liens{display:none}
+  .topbar .zone{gap:12px}
+  .score-haut{padding:22px 16px 18px;gap:4px}
+  .portrait{width:60px;height:60px;font-size:1.4rem}
+  .cote-athlete{flex-direction:column;gap:9px;text-align:center}
+  .cote-athlete.droite{flex-direction:column}
+  .cote-athlete .chiffre{font-size:2.6rem}
+  .score-bas{padding:13px 16px}
+  .grille-defis{grid-template-columns:1fr}
+  .panier{right:0;left:0;bottom:0;width:auto;max-width:none;border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+  .zone{padding:0 14px}
 }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
 </style>
 </head>
 <body>
 
+<!-- ============ PORTAIL DE CONNEXION ============ -->
+<div class="portail" id="portail">
+  <div class="portail-grille">
+    <div class="portail-gauche">
+      <div class="marque">OLYMPIADES<span>.</span></div>
+      <h1 id="portail-titre">Noam <em>contre</em> Thibault</h1>
+      <p class="accroche" id="portail-accroche">Neuf épreuves pour désigner le meilleur athlète des deux. Le public tranche avec ses points.</p>
+
+      <div class="duo">
+        <div class="p"><div class="portrait un" id="portail-p1">N</div><b id="portail-n1">Noam</b></div>
+        <span class="contre">VS</span>
+        <div class="p"><b id="portail-n2">Thibault</b><div class="portrait deux" id="portail-p2">T</div></div>
+      </div>
+
+      <div class="points-cles">
+        <div><div class="g num" id="pc-defis">9</div><div class="p">épreuves au programme</div></div>
+        <div><div class="g num">1 000</div><div class="p">points à l'inscription</div></div>
+        <div><div class="g num" id="pc-parieurs">0</div><div class="p">parieurs inscrits</div></div>
+      </div>
+    </div>
+
+    <div class="boite-connexion">
+      <h2>Rejoindre les Olympiades</h2>
+      <p class="intro">Un pseudo, un code à quatre chiffres, et vos points sont crédités.</p>
+      <label class="etiq" for="l-pseudo">Pseudo</label>
+      <input class="champ" id="l-pseudo" maxlength="18" autocomplete="nickname" placeholder="Celui que verront les autres">
+      <label class="etiq" for="l-code">Code à 4 chiffres</label>
+      <input class="champ num" id="l-code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
+      <p class="aide-champ">Il vous permet de retrouver votre compte depuis un autre appareil.</p>
+      <button class="btn large" id="btn-entrer" type="button">Entrer</button>
+      <p class="err" id="l-err"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BANDEAU ORGANISATEUR ============ -->
 <div class="barre-orga" id="barre-orga">
   <div class="zone">
-    <span>Mode organisateur — tu peux modifier les défis, les cotes et les résultats.</span>
-    <span style="display:flex;gap:8px">
-      <button class="bouton" id="btn-ouvrir-orga" type="button">Ouvrir le poste</button>
-      <button class="bouton creux" id="btn-quitter-orga" type="button">Quitter</button>
+    <span>Mode organisateur actif</span>
+    <span class="actions">
+      <button class="btn" id="btn-ouvrir-orga" type="button">Ouvrir le poste</button>
+      <button class="btn fantome" id="btn-quitter-orga" type="button">Quitter</button>
     </span>
   </div>
 </div>
 
-<div class="accueil" id="accueil">
-  <div class="carte-accueil">
-    <p class="sur-titre">Saison 1 · le duel qui tranche la question</p>
-    <h1 id="titre-accueil">Noam <span class="petit">contre</span> Thibault</h1>
-    <p class="pitch">Neuf défis, deux athlètes, un seul vainqueur. Choisis ton camp avant chaque épreuve et fais parler tes points.</p>
-    <ul class="regles-accueil">
-      <li><b>1 000 points</b> pour tout le monde à l'arrivée</li>
-      <li><b>+10 points</b> à chaque pronostic donné</li>
-      <li>Les paris ferment à l'heure du défi, sans exception</li>
-    </ul>
-    <div class="champs-accueil">
-      <div>
-        <label for="l-pseudo">Ton pseudo</label>
-        <input class="champ" id="l-pseudo" maxlength="18" autocomplete="nickname" placeholder="Celui que verront les autres">
-      </div>
-      <div>
-        <label for="l-code">Ton code à 4 chiffres</label>
-        <input class="champ num" id="l-code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
-      </div>
-    </div>
-    <p class="mot">Ce code te sert à retrouver ton compte depuis un autre téléphone. Nouveau pseudo, nouveau compte. Pseudo déjà pris, il faut le bon code.</p>
-    <button class="bouton grand" id="btn-entrer" type="button">Entrer dans le jeu</button>
-    <p class="erreur" id="l-erreur"></p>
-  </div>
-</div>
-
-<header class="terrain">
-  <div class="enseigne">
-    <p class="sur-titre">Saison 1 · le duel qui tranche la question</p>
-    <h1 id="titre-duel">Noam <span class="petit">contre</span> Thibault</h1>
-  </div>
-
-  <div class="tableau">
-    <div class="athlete n">
-      <div class="pastille" id="init-n">N</div>
-      <div class="nom" id="nom-n">Noam</div>
-      <div class="points num" id="score-n">0</div>
-      <div class="sous">défis remportés</div>
-    </div>
-    <div class="separateur">vs</div>
-    <div class="athlete t">
-      <div class="pastille" id="init-t">T</div>
-      <div class="nom" id="nom-t">Thibault</div>
-      <div class="points num" id="score-t">0</div>
-      <div class="sous">défis remportés</div>
-    </div>
-  </div>
-
-  <div class="chrono">
-    <p class="libelle" id="chrono-libelle">Prochain défi</p>
-    <div class="pendule" id="pendule"></div>
-  </div>
-</header>
-
-<div class="bandeau">
+<!-- ============ NAVIGATION ============ -->
+<div class="topbar">
   <div class="zone">
-    <div class="solde">
-      <span class="v num" id="solde">0</span>
-      <span class="qui">points · <b id="mon-pseudo"></b></span>
-    </div>
-    <nav class="nav-rapide">
-      <a href="#defis">Les défis</a>
-      <a href="#mes-paris">Mes paris</a>
+    <a class="marque" href="#haut">OLYMPIADES<span>.</span></a>
+    <nav class="liens">
+      <a href="#epreuves">Épreuves</a>
+      <a href="#paris">Mes paris</a>
       <a href="#classement">Classement</a>
     </nav>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="bouton creux" id="btn-rafraichir" type="button">Rafraîchir</button>
-      <button class="bouton creux" id="btn-sortir" type="button">Se déconnecter</button>
-    </div>
+    <button class="portefeuille" id="btn-profil" type="button">
+      <span class="pts num"><span id="solde">0</span><small>pts</small></span>
+      <span class="av m" id="av-topbar"></span>
+    </button>
   </div>
 </div>
 
-<main>
-  <section id="defis">
+<main id="haut">
+
+  <!-- ============ TABLEAU D'AFFICHAGE ============ -->
+  <div class="affiche">
     <div class="zone">
-      <div class="titre-section">
-        <h2>Les défis</h2>
-        <span class="aide">Donne ton pronostic (gratuit, +10 points) puis mise si tu le sens.</span>
+      <div class="carte-score">
+        <div class="score-haut">
+          <div class="cote-athlete un">
+            <div class="portrait un" id="portrait-1">N</div>
+            <div>
+              <div class="nom" id="nom-1">Noam</div>
+              <div class="chiffre num" id="score-1">0</div>
+              <div class="mention">épreuves gagnées</div>
+            </div>
+          </div>
+          <div class="milieu-score">
+            <div class="vs">VS</div>
+            <div class="jauge-duel"><i id="jauge-1"></i><i id="jauge-2"></i></div>
+            <div id="reste-epreuves" style="margin-top:6px;font-size:.72rem"></div>
+          </div>
+          <div class="cote-athlete deux droite">
+            <div class="portrait deux" id="portrait-2">T</div>
+            <div>
+              <div class="nom" id="nom-2">Thibault</div>
+              <div class="chiffre num" id="score-2">0</div>
+              <div class="mention">épreuves gagnées</div>
+            </div>
+          </div>
+        </div>
+        <div class="score-bas">
+          <div class="prochain">
+            <div class="vignette" id="prochain-photo"></div>
+            <div>
+              <div class="quoi" id="prochain-quoi">Prochaine épreuve</div>
+              <div class="quand" id="prochain-quand"></div>
+            </div>
+          </div>
+          <div class="compteur" id="compteur"></div>
+        </div>
       </div>
-      <div class="liste-defis" id="liste-defis"></div>
+    </div>
+  </div>
+
+  <!-- ============ ÉPREUVES ============ -->
+  <section id="epreuves">
+    <div class="zone">
+      <div class="tete-section">
+        <h2>Les épreuves</h2>
+        <div class="onglets" id="onglets" role="tablist">
+          <button role="tab" data-f="ouvert" aria-selected="true">À venir</button>
+          <button role="tab" data-f="fini" aria-selected="false">Résultats</button>
+          <button role="tab" data-f="tout" aria-selected="false">Tout</button>
+        </div>
+      </div>
+      <div class="grille-defis" id="grille-defis"></div>
     </div>
   </section>
 
-  <section id="mes-paris">
+  <!-- ============ MES PARIS ============ -->
+  <section id="paris">
     <div class="zone">
-      <div class="titre-section">
+      <div class="tete-section">
         <h2>Mes paris</h2>
-        <span class="aide">Tous tes tickets, en cours et réglés.</span>
+        <span class="sous">Tous vos tickets, en cours et réglés.</span>
       </div>
-      <div class="resume" id="resume-paris"></div>
-      <div id="liste-tickets"></div>
+      <div class="stats" id="stats"></div>
+      <div id="tickets"></div>
     </div>
   </section>
 
+  <!-- ============ CLASSEMENT ============ -->
   <section id="classement">
     <div class="zone">
-      <div class="titre-section">
-        <h2>Le classement des parieurs</h2>
-        <span class="aide">Chacun démarre avec 1 000 points.</span>
+      <div class="tete-section">
+        <h2>Classement</h2>
+        <span class="sous">Tout le monde démarre à 1 000 points.</span>
       </div>
-      <div id="tableau-classement"></div>
+      <div id="liste-classement"></div>
     </div>
   </section>
 </main>
@@ -461,115 +579,219 @@ select.champ{background:var(--pelouse-2)}
 <footer>
   <div class="zone">
     <span>Pseudos, mises et soldes sont visibles par tous les participants.</span>
-    <span id="mention-orga">Défis, cotes et résultats sont tenus par les deux athlètes.</span>
+    <span>Épreuves, cotes et résultats tenus par les deux athlètes.</span>
   </div>
 </footer>
 
-<div class="voile" id="voile-admin" role="dialog" aria-modal="true" aria-label="Espace organisateurs">
-  <div class="fenetre">
-    <h2>Poste des organisateurs</h2>
-    <p class="mot">Réservé à Noam et Thibault. Les paris se ferment tout seuls à l'heure du défi.</p>
-
-    <div id="admin-verrou">
-      <div class="grille-admin" style="max-width:340px">
-        <div>
-          <label for="code">Code d'accès</label>
-          <input class="champ" id="code" type="password" autocomplete="off">
-        </div>
+<!-- ============ PANIER DE PARI ============ -->
+<aside class="panier" id="panier" aria-live="polite">
+  <div class="panier-tete">
+    <strong>Votre pari</strong>
+    <button class="btn discret" id="btn-fermer-panier" type="button" aria-label="Fermer">✕</button>
+  </div>
+  <div class="panier-corps">
+    <div class="sel" id="panier-sel">
+      <div class="bulle" id="panier-bulle">1.90</div>
+      <div>
+        <div class="quoi" id="panier-camp">Noam</div>
+        <div class="sur" id="panier-epreuve">Ping-pong</div>
       </div>
-      <div style="margin-top:10px"><button class="bouton" id="btn-deverrouiller" type="button">Ouvrir le poste</button></div>
     </div>
+    <label class="etiq" for="panier-mise">Mise en points</label>
+    <input class="champ num" id="panier-mise" type="number" min="1" step="1" placeholder="0">
+    <div class="rapides">
+      <button type="button" data-m="50">50</button>
+      <button type="button" data-m="100">100</button>
+      <button type="button" data-m="250">250</button>
+      <button type="button" data-m="max">Max</button>
+    </div>
+    <div class="retour-ligne"><span class="faible">Retour potentiel</span><span class="gain num" id="panier-retour">0 pts</span></div>
+    <button class="btn large" id="btn-valider-pari" type="button" style="margin-top:14px">Valider le pari</button>
+  </div>
+</aside>
 
-    <div id="admin-contenu" style="display:none">
-      <div class="ligne-admin">
-        <strong>Les athlètes</strong>
-        <div class="grille-admin">
-          <div><label for="a-nom1">Athlète 1</label><input class="champ" id="a-nom1"></div>
-          <div><label for="a-nom2">Athlète 2</label><input class="champ" id="a-nom2"></div>
-        </div>
-        <div class="actions"><button class="bouton" id="btn-noms" type="button">Enregistrer les noms</button></div>
+<!-- ============ PROFIL ============ -->
+<div class="voile" id="voile-profil" role="dialog" aria-modal="true" aria-label="Mon profil">
+  <div class="modale etroite">
+    <div class="modale-tete">
+      <div>
+        <h2>Mon profil</h2>
+        <p id="profil-sous">Votre photo apparaît sur vos paris et au classement.</p>
       </div>
-
-      <h3 style="font-size:1.2rem;margin:18px 0 8px">Ce qui est misé</h3>
-      <div id="admin-tableau"></div>
-
-      <h3 style="font-size:1.2rem;margin:18px 0 8px">Défis programmés</h3>
-      <div id="admin-defis"></div>
-
-      <div class="ligne-admin" style="border-style:dashed">
-        <strong>Ajouter un défi</strong>
-        <div class="grille-admin">
-          <div><label for="n-sport">Sport</label><input class="champ" id="n-sport" placeholder="Sprint 100 m"></div>
-          <div><label for="n-date">Date et heure</label><input class="champ" id="n-date" type="datetime-local"></div>
-          <div><label for="n-c1">Cote athlète 1</label><input class="champ" id="n-c1" type="number" step="0.05" min="1.01" value="1.90"></div>
-          <div><label for="n-c2">Cote athlète 2</label><input class="champ" id="n-c2" type="number" step="0.05" min="1.01" value="1.90"></div>
-        </div>
-        <div class="grille-admin">
-          <div style="grid-column:1/-1"><label for="n-regle">Règle du défi</label><input class="champ" id="n-regle" placeholder="Départ arrêté, meilleur des deux chronos."></div>
-        </div>
-        <div class="actions"><button class="bouton" id="btn-ajouter" type="button">Ajouter le défi</button></div>
-      </div>
-
-      <h3 style="font-size:1.2rem;margin:18px 0 8px">Les parieurs</h3>
-      <div id="admin-joueurs"></div>
-      <div class="actions" style="margin:0 0 14px">
-        <button class="bouton creux danger" id="btn-recrediter" type="button">Remettre tout le monde à 1 000 points</button>
-      </div>
-
-      <div class="ligne-admin">
-        <strong>Changer le code d'accès</strong>
-        <p class="mot">Le nouveau code remplace l'ancien pour tout le monde, tout de suite. Notez-le quelque part : il n'est stocké nulle part en clair et personne ne peut le retrouver.</p>
-        <div class="grille-admin" style="max-width:340px">
-          <div><label for="nouveau-code">Nouveau code</label><input class="champ" id="nouveau-code" type="text" autocomplete="off"></div>
-        </div>
-        <div class="actions"><button class="bouton" id="btn-changer-code" type="button">Enregistrer le code</button></div>
-      </div>
-
-      <div class="ligne-admin">
-        <strong>Sauvegarde</strong>
-        <p class="mot">Copie ce texte quelque part si tu veux pouvoir tout restaurer.</p>
-        <textarea class="champ" id="export" rows="4" style="width:100%"></textarea>
+      <button class="btn discret" id="btn-fermer-profil" type="button" aria-label="Fermer">✕</button>
+    </div>
+    <div class="bloc">
+      <div class="photo-champ">
+        <div class="apercu rond" id="profil-apercu">photo</div>
         <div class="actions">
-          <button class="bouton creux" id="btn-export" type="button">Afficher la sauvegarde</button>
-          <button class="bouton creux" id="btn-import" type="button">Restaurer depuis ce texte</button>
+          <button class="btn fantome" id="btn-photo-profil" type="button">Choisir une photo</button>
+          <button class="btn discret" id="btn-retirer-photo" type="button">Retirer</button>
         </div>
       </div>
+      <input type="file" id="fichier-profil" accept="image/*">
     </div>
-
-    <div style="margin-top:16px;text-align:right"><button class="bouton creux" id="btn-fermer-admin" type="button">Fermer</button></div>
+    <div class="bloc">
+      <div class="rangee" style="margin:0">
+        <div><div class="etiq">Pseudo</div><strong id="profil-pseudo">—</strong></div>
+        <div><div class="etiq">Solde</div><strong class="num" id="profil-solde">—</strong></div>
+        <div><div class="etiq">Tickets gagnés</div><strong id="profil-ratio">—</strong></div>
+      </div>
+    </div>
+    <div class="actions" style="justify-content:space-between">
+      <button class="btn danger" id="btn-deconnexion" type="button">Se déconnecter</button>
+      <button class="btn fantome" id="btn-actualiser" type="button">Actualiser</button>
+    </div>
   </div>
 </div>
 
-<div class="messages" id="messages"></div>
+<!-- ============ POSTE DES ORGANISATEURS ============ -->
+<div class="voile" id="voile-orga" role="dialog" aria-modal="true" aria-label="Poste des organisateurs">
+  <div class="modale">
+    <div class="modale-tete">
+      <div>
+        <h2>Poste des organisateurs</h2>
+        <p>Réservé aux deux athlètes. Les paris se ferment automatiquement à l'heure de l'épreuve.</p>
+      </div>
+      <button class="btn discret" id="btn-fermer-orga" type="button" aria-label="Fermer">✕</button>
+    </div>
 
+    <div id="verrou">
+      <div class="bloc">
+        <label class="etiq" for="code">Code d'accès</label>
+        <input class="champ" id="code" type="password" autocomplete="off" style="max-width:280px">
+        <div class="actions" style="margin-top:12px"><button class="btn" id="btn-deverrouiller" type="button">Ouvrir le poste</button></div>
+      </div>
+    </div>
+
+    <div id="contenu-orga" style="display:none">
+
+      <div class="bloc">
+        <strong>Les athlètes</strong>
+        <div class="rangee">
+          <div>
+            <label class="etiq" for="a-nom1">Athlète 1</label>
+            <input class="champ" id="a-nom1">
+            <div class="photo-champ" style="margin-top:10px">
+              <div class="apercu rond" id="apercu-a1">photo</div>
+              <button class="btn fantome" id="btn-photo-a1" type="button">Photo</button>
+              <input type="file" id="fichier-a1" accept="image/*">
+            </div>
+          </div>
+          <div>
+            <label class="etiq" for="a-nom2">Athlète 2</label>
+            <input class="champ" id="a-nom2">
+            <div class="photo-champ" style="margin-top:10px">
+              <div class="apercu rond" id="apercu-a2">photo</div>
+              <button class="btn fantome" id="btn-photo-a2" type="button">Photo</button>
+              <input type="file" id="fichier-a2" accept="image/*">
+            </div>
+          </div>
+        </div>
+        <div class="actions"><button class="btn" id="btn-athletes" type="button">Enregistrer les athlètes</button></div>
+      </div>
+
+      <div class="bloc">
+        <strong>Déclarer un résultat</strong>
+        <p class="mot">Le vainqueur règle tous les tickets de l'épreuve, immédiatement.</p>
+        <div class="rangee">
+          <div>
+            <label class="etiq" for="r-defi">Épreuve</label>
+            <select class="champ" id="r-defi"></select>
+          </div>
+          <div>
+            <label class="etiq" for="r-vainqueur">Vainqueur</label>
+            <select class="champ" id="r-vainqueur"></select>
+          </div>
+          <div>
+            <label class="etiq" for="r-score">Score (facultatif)</label>
+            <input class="champ" id="r-score" placeholder="21-18, 3-1, 12″84…">
+          </div>
+        </div>
+        <div class="rangee large">
+          <div>
+            <label class="etiq" for="r-note">Commentaire (facultatif)</label>
+            <input class="champ" id="r-note" placeholder="Deux balles de match sauvées, remontée au troisième set.">
+          </div>
+        </div>
+        <div class="actions"><button class="btn" id="btn-resultat" type="button">Publier le résultat</button></div>
+      </div>
+
+      <div class="bloc">
+        <strong>Ce qui est misé</strong>
+        <div id="tableau-mises"></div>
+      </div>
+
+      <h3 style="font-size:1.05rem;margin:20px 0 10px">Les épreuves</h3>
+      <div id="admin-defis"></div>
+
+      <div class="bloc" style="border-style:dashed">
+        <strong>Ajouter une épreuve</strong>
+        <div class="rangee">
+          <div><label class="etiq" for="n-sport">Nom</label><input class="champ" id="n-sport" placeholder="Sprint 100 m"></div>
+          <div><label class="etiq" for="n-date">Date et heure</label><input class="champ" id="n-date" type="datetime-local"></div>
+          <div><label class="etiq" for="n-c1">Cote athlète 1</label><input class="champ num" id="n-c1" type="number" step="0.05" min="1.01" value="1.90"></div>
+          <div><label class="etiq" for="n-c2">Cote athlète 2</label><input class="champ num" id="n-c2" type="number" step="0.05" min="1.01" value="1.90"></div>
+        </div>
+        <div class="rangee large">
+          <div><label class="etiq" for="n-regle">Règle</label><input class="champ" id="n-regle" placeholder="Départ arrêté, chrono au centième."></div>
+        </div>
+        <div class="photo-champ" style="margin-bottom:12px">
+          <div class="apercu" id="apercu-n">photo</div>
+          <button class="btn fantome" id="btn-photo-n" type="button">Photo de l'épreuve</button>
+          <input type="file" id="fichier-n" accept="image/*">
+        </div>
+        <div class="actions"><button class="btn" id="btn-ajouter" type="button">Ajouter l'épreuve</button></div>
+      </div>
+
+      <div class="bloc">
+        <strong>Les parieurs</strong>
+        <div id="admin-joueurs"></div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn danger" id="btn-recrediter" type="button">Remettre tout le monde à 1 000 points</button>
+        </div>
+      </div>
+
+      <div class="bloc">
+        <strong>Code d'accès</strong>
+        <p class="mot">Le nouveau code remplace l'ancien pour tout le monde, immédiatement. Notez-le : il n'est stocké nulle part en clair.</p>
+        <div style="max-width:280px"><input class="champ" id="nouveau-code" placeholder="Nouveau code"></div>
+        <div class="actions" style="margin-top:12px"><button class="btn" id="btn-changer-code" type="button">Enregistrer le code</button></div>
+      </div>
+
+      <div class="bloc">
+        <strong>Sauvegarde</strong>
+        <p class="mot">Copiez ce texte pour pouvoir tout restaurer plus tard.</p>
+        <textarea class="champ" id="export" rows="3"></textarea>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn fantome" id="btn-export" type="button">Afficher</button>
+          <button class="btn fantome" id="btn-import" type="button">Restaurer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notes" id="notes"></div>
 <script>
 /* =====================================================================
-   NOAM vs THIBAULT — site de duel sportif
-   Un seul fichier. Deux clés de stockage partagées :
-     duel:etat    -> les défis, les cotes, les résultats, les noms
-     duel:joueurs -> les parieurs (pronostics + mises)
-   Le solde n'est jamais stocké : il est recalculé à partir des paris et
-   des résultats. Impossible de payer deux fois le même ticket.
+   OLYMPIADES — application
+   Deux espaces : le site (joueurs) et le poste des organisateurs,
+   accessible par #orga ou en tapant o-r-g-a, protégé par un code.
+   Deux clés de stockage partagées :
+     duel:etat    -> athlètes, épreuves, cotes, résultats, photos
+     duel:joueurs -> comptes, pronostics, paris, photos de profil
+   Le solde n'est jamais stocké : il est recalculé depuis les paris et
+   les résultats, donc un ticket ne peut pas être payé deux fois.
    ===================================================================== */
 
-/* ---------------------------------------------------------------------
-   DEUX ESPACES
-   · Espace joueur   : la page. Pronostics, mises, classement.
-   · Poste organisateurs : invisible depuis la page. On y entre en ajoutant
-     #orga à l'adresse du site, puis avec le code d'accès.
-     Le code n'apparaît nulle part dans le fichier : seule son empreinte
-     est écrite ci-dessous, et elle ne permet pas de le retrouver.
-     Code de départ : DUEL2026 — change-le dès la première visite,
-     depuis le poste lui-même.
-   --------------------------------------------------------------------- */
 const SEL            = "duel-orga-v1";
-const EMPREINTE_BASE = "f0f7cf13ffc2797e";   // empreinte de DUEL2026
-const DEPART      = 1000;         // points offerts à l'inscription
-const BONUS_VOTE  = 10;           // points gagnés à chaque pronostic gratuit
+const EMPREINTE_BASE = "f0f7cf13ffc2797e";   // empreinte du code DUEL2026
+const DEPART      = 1000;
 const CLE_ETAT    = "duel:etat";
 const CLE_JOUEURS = "duel:joueurs";
 const CLE_MOI     = "duel:moi";
 const CLE_ORGA    = "duel:orga";
+const VERSION     = 2;
 
 function hacher(txt){
   let h1=0x9e3779b9, h2=0x85ebca6b; const s=txt+SEL;
@@ -581,12 +803,12 @@ function hacher(txt){
   return ((h1>>>0).toString(16).padStart(8,"0"))+((h2>>>0).toString(16).padStart(8,"0"));
 }
 
-/* ---------- Stockage : partagé dans Claude, local ailleurs ---------- */
-const aStockagePartage = typeof window !== "undefined" && !!window.storage;
+/* ---------- Stockage : partagé quand c'est possible, local sinon ---------- */
+const partageDispo = typeof window !== "undefined" && !!window.storage;
 const casier = {
   async lire(cle, partage, defaut){
     try{
-      if(aStockagePartage){
+      if(partageDispo){
         const r = await window.storage.get(cle, partage);
         return r && r.value ? JSON.parse(r.value) : defaut;
       }
@@ -596,48 +818,46 @@ const casier = {
   },
   async ecrire(cle, valeur, partage){
     const texte = JSON.stringify(valeur);
-    if(aStockagePartage){ await window.storage.set(cle, texte, partage); return; }
+    if(partageDispo){ await window.storage.set(cle, texte, partage); return; }
     localStorage.setItem((partage?"p:":"m:")+cle, texte);
   }
 };
 
-/* ---------- Défis de démarrage (à remplacer par les tiens) ---------- */
-function dansNJours(n, h){
-  const d = new Date();
-  d.setDate(d.getDate()+n); d.setHours(h,0,0,0);
-  return d.toISOString();
-}
-const VERSION_CALENDRIER = 2;   // change ce numéro pour réinitialiser le calendrier
-const ETAT_PAR_DEFAUT = {
-  version:VERSION_CALENDRIER,
+/* ---------- Programme par défaut ---------- */
+function dansNJours(n,h){ const d=new Date(); d.setDate(d.getDate()+n); d.setHours(h,0,0,0); return d.toISOString(); }
+const ETAT_DEFAUT = {
+  version:VERSION,
   noms:["Noam","Thibault"],
+  photos:[null,null],
   defis:[
-    {id:"d1", sport:"Ping-pong",        date:dansNJours(3,19),  c1:1.90, c2:1.90, regle:"Trois matchs en 21 points. Celui qui prend deux matchs prend le défi.", resultat:null},
-    {id:"d2", sport:"Course 200 m",     date:dansNJours(6,18),  c1:1.90, c2:1.90, regle:"Un seul départ, chrono au centième. Le premier sur la ligne l'emporte.", resultat:null},
-    {id:"d3", sport:"Natation 4×100 m", date:dansNJours(10,17), c1:1.90, c2:1.90, regle:"Quatre fois cent mètres nage libre, chrono cumulé.", resultat:null},
-    {id:"d4", sport:"FIFA",             date:dansNJours(13,21), c1:1.90, c2:1.90, regle:"Trois matchs, équipes tirées au sort. Deux victoires suffisent.", resultat:null},
-    {id:"d5", sport:"Billard",          date:dansNJours(17,21), c1:1.90, c2:1.90, regle:"Premier à deux manches gagnées. La noire mal jouée offre la manche.", resultat:null},
-    {id:"d6", sport:"Tirs au but",      date:dansNJours(20,15), c1:1.90, c2:1.90, regle:"Cinq tirs chacun, alternance tireur et gardien, mort subite ensuite.", resultat:null},
-    {id:"d7", sport:"Tennis",           date:dansNJours(24,14), c1:1.90, c2:1.90, regle:"Un set gagnant, jeu décisif à six partout.", resultat:null},
-    {id:"d8", sport:"Padel",            date:dansNJours(28,11), c1:1.90, c2:1.90, regle:"Trois jeux, on change de partenaire à chaque jeu. On compte les jeux gagnés.", resultat:null},
-    {id:"d9", sport:"Rugby",            date:dansNJours(32,15), c1:1.90, c2:1.90, regle:"Match à plusieurs, même durée sur le terrain. Le plus d'essais marqués gagne.", resultat:null}
-  ]
+    {id:"d1", sport:"Ping-pong",        date:dansNJours(3,19),  c1:1.90, c2:1.90, regle:"Trois matchs en 21 points. Deux matchs gagnés suffisent."},
+    {id:"d2", sport:"Course 200 m",     date:dansNJours(6,18),  c1:1.90, c2:1.90, regle:"Un seul départ, chrono au centième."},
+    {id:"d3", sport:"Natation 4×100 m", date:dansNJours(10,17), c1:1.90, c2:1.90, regle:"Quatre fois cent mètres nage libre, chrono cumulé."},
+    {id:"d4", sport:"FIFA",             date:dansNJours(13,21), c1:1.90, c2:1.90, regle:"Trois matchs, équipes tirées au sort."},
+    {id:"d5", sport:"Billard",          date:dansNJours(17,21), c1:1.90, c2:1.90, regle:"Premier à deux manches gagnées."},
+    {id:"d6", sport:"Tirs au but",      date:dansNJours(20,15), c1:1.90, c2:1.90, regle:"Cinq tirs chacun, alternance tireur et gardien, mort subite ensuite."},
+    {id:"d7", sport:"Tennis",           date:dansNJours(24,14), c1:1.90, c2:1.90, regle:"Un set gagnant, jeu décisif à six partout."},
+    {id:"d8", sport:"Padel",            date:dansNJours(28,11), c1:1.90, c2:1.90, regle:"Trois jeux, changement de partenaire à chaque jeu."},
+    {id:"d9", sport:"Rugby",            date:dansNJours(32,15), c1:1.90, c2:1.90, regle:"Même temps de jeu, le plus d'essais marqués l'emporte."}
+  ].map(d => Object.assign(d,{resultat:null, score:"", note:"", photo:null}))
 };
 
-let etat = null, joueurs = {}, moi = null, estOrga = false;
-let choix = {};          // {idDefi: "1" | "2"} — le camp sélectionné avant de miser
-let minuteur = null;
+let etat=null, joueurs={}, moi=null, estOrga=false;
+let filtre="ouvert", panier=null;
 
-/* ---------- Petits utilitaires ---------- */
+/* ---------- Outils ---------- */
 const $  = s => document.querySelector(s);
-const el = (t,c,x) => { const n=document.createElement(t); if(c)n.className=c; if(x!=null)n.textContent=x; return n; };
-const echappe = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const el = (t,c,x)=>{ const n=document.createElement(t); if(c)n.className=c; if(x!=null)n.textContent=x; return n; };
+const echappe = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const nb = n => Math.round(n).toLocaleString("fr-FR");
+const defiPar = id => etat.defis.find(d=>d.id===id);
+const estPasse = d => new Date(d).getTime() <= Date.now();
+const ouvert = d => !d.resultat && !estPasse(d.date);
 
-function message(texte, ko){
-  const m = el("div","message"+(ko?" ko":""),texte);
-  $("#messages").appendChild(m);
-  setTimeout(()=>m.remove(), 3200);
+function note(texte, ko){
+  const n = el("div","note"+(ko?" ko":""),texte);
+  $("#notes").appendChild(n);
+  setTimeout(()=>n.remove(), 3400);
 }
 function dateLisible(iso){
   const d = new Date(iso);
@@ -645,20 +865,84 @@ function dateLisible(iso){
   return d.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})
        + " · " + d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
 }
-const estPasse  = d => new Date(d).getTime() <= Date.now();
-const defiPar   = id => etat.defis.find(d => d.id === id);
-const ouvert    = d => !d.resultat && !estPasse(d.date);
+function delai(iso){
+  let r = new Date(iso).getTime() - Date.now();
+  if(r <= 0) return null;
+  const j = Math.floor(r/86400000), h = Math.floor(r/3600000)%24, m = Math.floor(r/60000)%60;
+  if(j > 0) return "dans "+j+" j "+h+" h";
+  if(h > 0) return "dans "+h+" h "+m+" min";
+  return "dans "+m+" min";
+}
+function probas(c1,c2){
+  const a = 1/c1, b = 1/c2, t = a+b;
+  return [Math.round(a/t*100), Math.round(b/t*100)];
+}
+function avatarHTML(pseudo, taille){
+  const j = joueurs[pseudo];
+  const init = (pseudo||"?").charAt(0).toUpperCase();
+  return j && j.photo
+    ? '<span class="av '+taille+'"><img src="'+j.photo+'" alt=""></span>'
+    : '<span class="av '+taille+'">'+echappe(init)+'</span>';
+}
+function portraitHTML(i){
+  const p = (etat.photos||[])[i];
+  return p ? '<img src="'+p+'" alt="">' : echappe((etat.noms[i]||"?").charAt(0).toUpperCase());
+}
 
-/* ---------- Comptes : le solde se recalcule, il ne se stocke pas ---------- */
+/* ---------- Photos : redimensionnées avant stockage ---------- */
+function imageVers(fichier, largeur, hauteur, qualite){
+  return new Promise((ok,ko)=>{
+    if(!fichier) return ko(new Error("aucun fichier"));
+    if(!/^image\//.test(fichier.type)) return ko(new Error("ce fichier n'est pas une image"));
+    if(fichier.size > 15*1024*1024) return ko(new Error("image trop lourde"));
+    const fr = new FileReader();
+    fr.onerror = ()=>ko(new Error("lecture impossible"));
+    fr.onload = ()=>{
+      const im = new Image();
+      im.onerror = ()=>ko(new Error("image illisible"));
+      im.onload = ()=>{
+        const c = document.createElement("canvas");
+        c.width = largeur; c.height = hauteur;
+        const ctx = c.getContext("2d");
+        const e = Math.max(largeur/im.width, hauteur/im.height);
+        const l = im.width*e, h = im.height*e;
+        ctx.drawImage(im, (largeur-l)/2, (hauteur-h)/2, l, h);
+        ok(c.toDataURL("image/jpeg", qualite));
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(fichier);
+  });
+}
+function brancherPhoto(idBouton, idFichier, idApercu, largeur, hauteur, apres){
+  const b = document.getElementById(idBouton), f = document.getElementById(idFichier);
+  if(!b || !f) return;
+  b.addEventListener("click", ()=>f.click());
+  f.addEventListener("change", async ()=>{
+    try{
+      const url = await imageVers(f.files[0], largeur, hauteur, .74);
+      montrerApercu(idApercu, url);
+      apres(url);
+    }catch(e){ note(e.message || "Photo refusée.", true); }
+    f.value = "";
+  });
+}
+function montrerApercu(id, url){
+  const a = document.getElementById(id);
+  if(!a) return;
+  a.innerHTML = url ? '<img src="'+url+'" alt="">' : "photo";
+}
+
+/* ---------- Comptes ---------- */
 function solde(pseudo){
   const j = joueurs[pseudo];
   if(!j) return DEPART;
-  let s = DEPART + BONUS_VOTE * Object.keys(j.votes||{}).length;
+  let s = DEPART;
   for(const p of (j.paris||[])){
     const d = defiPar(p.defi);
     s -= p.mise;
-    if(!d) { s += p.mise; continue; }               // défi supprimé -> remboursé
-    if(d.resultat === "annule") s += p.mise;        // défi annulé -> remboursé
+    if(!d){ s += p.mise; continue; }
+    if(d.resultat === "annule") s += p.mise;
     else if(d.resultat === p.camp) s += p.mise * p.cote;
   }
   return Math.floor(s);
@@ -670,27 +954,23 @@ function etatPari(p){
   return d.resultat === p.camp ? "gagne" : "perdu";
 }
 
-/* ---------- Lecture / écriture ---------- */
+/* ---------- Chargement ---------- */
 async function charger(){
   etat = await casier.lire(CLE_ETAT, true, null);
-  if(!etat || !Array.isArray(etat.defis) || etat.version !== VERSION_CALENDRIER){
-    etat = ETAT_PAR_DEFAUT;
+  if(!etat || !Array.isArray(etat.defis) || etat.version !== VERSION){
+    etat = ETAT_DEFAUT;
     await casier.ecrire(CLE_ETAT, etat, true);
   }
   if(!Array.isArray(etat.noms) || etat.noms.length !== 2) etat.noms = ["Noam","Thibault"];
+  if(!Array.isArray(etat.photos)) etat.photos = [null,null];
   joueurs = await casier.lire(CLE_JOUEURS, true, {}) || {};
-  const local = await casier.lire(CLE_MOI, false, null);
-  if(local && local.pseudo) moi = local.pseudo;
-  const sess = await casier.lire(CLE_ORGA, false, null);
-  // la session organisateur ne vaut que si l'empreinte gardée correspond encore
-  estOrga = !!(sess && sess.empreinte && sess.empreinte === empreinteCourante());
+  const l = await casier.lire(CLE_MOI, false, null);
+  moi = (l && l.pseudo) ? l.pseudo : null;
+  const s = await casier.lire(CLE_ORGA, false, null);
+  estOrga = !!(s && s.empreinte && s.empreinte === empreinteCourante());
 }
-function empreinteCourante(){
-  return (etat && etat.empreinte) ? etat.empreinte : EMPREINTE_BASE;
-}
+function empreinteCourante(){ return (etat && etat.empreinte) ? etat.empreinte : EMPREINTE_BASE; }
 async function sauverEtat(){ await casier.ecrire(CLE_ETAT, etat, true); }
-
-// on relit avant d'écrire pour ne pas écraser les paris des autres
 async function sauverMonJoueur(modif){
   const frais = await casier.lire(CLE_JOUEURS, true, {}) || {};
   const actuel = frais[moi] || {votes:{}, paris:[]};
@@ -699,652 +979,760 @@ async function sauverMonJoueur(modif){
   await casier.ecrire(CLE_JOUEURS, frais, true);
 }
 
-/* ---------- Affichage : en-tête ---------- */
-function rendreEnTete(){
-  const [n1,n2] = etat.noms;
-  $("#titre-duel").innerHTML = echappe(n1) + '<span class="petit">contre</span>' + echappe(n2);
-  const ta = document.getElementById("titre-accueil");
-  if(ta) ta.innerHTML = echappe(n1) + '<span class="petit">contre</span>' + echappe(n2);
-  $("#nom-n").textContent = n1; $("#nom-t").textContent = n2;
-  $("#init-n").textContent = n1.charAt(0).toUpperCase();
-  $("#init-t").textContent = n2.charAt(0).toUpperCase();
-  document.title = n1 + " vs " + n2 + " — Le Duel";
-  $("#score-n").textContent = etat.defis.filter(d=>d.resultat==="1").length;
-  $("#score-t").textContent = etat.defis.filter(d=>d.resultat==="2").length;
-}
-
-function prochainDefi(){
-  const futurs = etat.defis.filter(d => !d.resultat && !estPasse(d.date))
-                           .sort((a,b)=> new Date(a.date)-new Date(b.date));
-  return futurs[0] || null;
-}
-function defiEnCours(){
-  // un défi est "sur le terrain" pendant les 6 heures qui suivent son horaire
-  return etat.defis.filter(d => !d.resultat && estPasse(d.date)
-                    && Date.now() - new Date(d.date).getTime() < 6*3600*1000)
-                   .sort((a,b)=> new Date(b.date)-new Date(a.date))[0] || null;
-}
-function rendreChrono(){
-  const p = prochainDefi(), direct = defiEnCours(), pend = $("#pendule");
-  if(!p && direct){
-    $("#chrono-libelle").innerHTML = "Sur le terrain en ce moment";
-    pend.innerHTML = '<span class="en-direct"><span class="pastille-live"></span>' + echappe(direct.sport) + '</span>';
-    return;
-  }
-  if(!p){
-    $("#chrono-libelle").textContent = "Aucun défi programmé";
-    pend.innerHTML = '<span class="en-direct">Le calendrier arrive</span>';
-    return;
-  }
-  $("#chrono-libelle").innerHTML = "Prochain défi · <b>" + echappe(p.sport) + "</b>" +
-    (direct ? " · " + echappe(direct.sport) + " est en cours" : "");
-  let reste = Math.max(0, new Date(p.date).getTime() - Date.now());
-  const j = Math.floor(reste/86400000); reste -= j*86400000;
-  const h = Math.floor(reste/3600000);  reste -= h*3600000;
-  const m = Math.floor(reste/60000);    reste -= m*60000;
-  const s = Math.floor(reste/1000);
-  const bloc = (v,u)=>'<div><div class="v num">'+String(v).padStart(2,"0")+'</div><div class="u">'+u+'</div></div>';
-  pend.innerHTML = bloc(j,"jours")+bloc(h,"heures")+bloc(m,"minutes")+bloc(s,"secondes");
-}
-
-/* ---------- Affichage : compte ---------- */
-function rendreCompte(){
-  const connecte = !!moi;
-  document.getElementById("accueil").classList.toggle("visible", !connecte);
-  document.body.style.overflow = connecte ? "" : "hidden";
-  if(connecte){
-    $("#mon-pseudo").textContent = moi;
-    $("#solde").textContent = nb(solde(moi));
-  }
-}
-
 /* ---------- Connexion ---------- */
 function pseudoExistant(p){
   const bas = p.toLowerCase();
   return Object.keys(joueurs).find(x => x.toLowerCase() === bas) || null;
 }
 async function entrer(){
-  const err = $("#l-erreur");
+  const err = $("#l-err");
   const p = $("#l-pseudo").value.trim().replace(/\s+/g," ").slice(0,18);
   const c = $("#l-code").value.trim();
   err.textContent = "";
-  if(p.length < 2)       return err.textContent = "Il faut au moins deux caractères dans ton pseudo.";
-  if(!/^\d{4}$/.test(c)) return err.textContent = "Ton code doit faire exactement quatre chiffres.";
-
-  joueurs = await casier.lire(CLE_JOUEURS, true, {}) || {};   // on repart des données fraîches
+  if(p.length < 2)       return err.textContent = "Deux caractères minimum dans le pseudo.";
+  if(!/^\d{4}$/.test(c)) return err.textContent = "Le code doit faire exactement quatre chiffres.";
+  joueurs = await casier.lire(CLE_JOUEURS, true, {}) || {};
   const existant = pseudoExistant(p);
-  const empreinte = hacher("pin:"+c);
-
+  const emp = hacher("pin:"+c);
   if(existant){
     const j = joueurs[existant];
-    if(j.code && j.code !== empreinte)
-      return err.textContent = "Ce pseudo est déjà pris et le code ne correspond pas.";
+    if(j.code && j.code !== emp) return err.textContent = "Ce pseudo est pris et le code ne correspond pas.";
     moi = existant;
-    if(!j.code){ await sauverMonJoueur(x => { x.code = empreinte; return x; }); }
-    message("Content de te revoir, "+moi+".");
+    if(!j.code) await sauverMonJoueur(x=>{ x.code = emp; return x; });
+    note("Content de vous revoir, "+moi+".");
   }else{
     moi = p;
-    await sauverMonJoueur(x => { x.code = empreinte; x.depuis = Date.now(); return x; });
-    message("Bienvenue "+moi+". Tu démarres avec "+nb(DEPART)+" points.");
+    await sauverMonJoueur(x=>{ x.code = emp; x.depuis = Date.now(); return x; });
+    note("Bienvenue "+moi+". 1 000 points crédités.");
   }
   await casier.ecrire(CLE_MOI, {pseudo:moi}, false);
-  $("#l-pseudo").value = ""; $("#l-code").value = "";
+  $("#l-pseudo").value=""; $("#l-code").value="";
   toutRendre();
 }
 
-/* ---------- Affichage : défis ---------- */
-function comptesVotes(idDefi){
+/* ---------- Affichage : portail et en-tête ---------- */
+function rendrePortail(){
+  const connecte = !!moi;
+  $("#portail").classList.toggle("visible", !connecte);
+  document.body.style.overflow = connecte ? "" : "hidden";
+  if(connecte) return;
+  const [n1,n2] = etat.noms;
+  $("#portail-titre").innerHTML = echappe(n1)+"<em>contre</em>"+echappe(n2);
+  $("#portail-n1").textContent = n1;
+  $("#portail-n2").textContent = n2;
+  $("#portail-p1").innerHTML = portraitHTML(0);
+  $("#portail-p2").innerHTML = portraitHTML(1);
+  $("#pc-defis").textContent = etat.defis.length;
+  $("#pc-parieurs").textContent = Object.keys(joueurs).length;
+}
+function rendreEnTete(){
+  const [n1,n2] = etat.noms;
+  document.title = "Olympiades — "+n1+" vs "+n2;
+  $("#nom-1").textContent = n1; $("#nom-2").textContent = n2;
+  $("#portrait-1").innerHTML = portraitHTML(0);
+  $("#portrait-2").innerHTML = portraitHTML(1);
+  const g1 = etat.defis.filter(d=>d.resultat==="1").length;
+  const g2 = etat.defis.filter(d=>d.resultat==="2").length;
+  $("#score-1").textContent = g1;
+  $("#score-2").textContent = g2;
+  const tot = g1+g2;
+  $("#jauge-1").style.cssText = "width:"+(tot?g1/tot*100:50)+"%;background:var(--un)"+(tot?"":";opacity:.3");
+  $("#jauge-2").style.cssText = "width:"+(tot?g2/tot*100:50)+"%;background:var(--deux)"+(tot?"":";opacity:.3");
+  const reste = etat.defis.filter(d=>!d.resultat).length;
+  $("#reste-epreuves").innerHTML = '<span class="faible">'+(reste? reste+" épreuve"+(reste>1?"s":"")+" à jouer" : "saison terminée")+'</span>';
+  if(moi){
+    $("#solde").textContent = nb(solde(moi));
+    const av = $("#av-topbar");
+    const jm = joueurs[moi] || {};
+    av.innerHTML = jm.photo ? '<img src="'+jm.photo+'" alt="">' : echappe(moi.charAt(0).toUpperCase());
+  }
+}
+function prochaineEpreuve(){
+  return etat.defis.filter(d=>!d.resultat && !estPasse(d.date))
+                   .sort((a,b)=>new Date(a.date)-new Date(b.date))[0] || null;
+}
+function epreuveEnCours(){
+  return etat.defis.filter(d=>!d.resultat && estPasse(d.date)
+             && Date.now()-new Date(d.date).getTime() < 6*3600*1000)
+             .sort((a,b)=>new Date(b.date)-new Date(a.date))[0] || null;
+}
+function rendreCompteur(){
+  const p = prochaineEpreuve(), live = epreuveEnCours(), c = $("#compteur");
+  const cible = live || p;
+  const vig = $("#prochain-photo");
+  const voulu = (cible && cible.photo) ? cible.photo : "";
+  if(vig.dataset.src !== voulu){
+    vig.dataset.src = voulu;
+    vig.innerHTML = voulu ? '<img src="'+voulu+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">' : "";
+  }
+  if(!cible){
+    $("#prochain-quoi").textContent = "Saison terminée";
+    $("#prochain-quand").textContent = "Toutes les épreuves ont été jouées";
+    c.innerHTML = ""; return;
+  }
+  if(live){
+    $("#prochain-quoi").textContent = live.sport;
+    $("#prochain-quand").textContent = "En cours · résultat attendu";
+    c.innerHTML = '<div style="min-width:auto;padding:8px 14px"><span class="pil direct"><i class="point"></i>en direct</span></div>';
+    return;
+  }
+  $("#prochain-quoi").textContent = p.sport;
+  $("#prochain-quand").textContent = dateLisible(p.date);
+  let r = Math.max(0, new Date(p.date).getTime()-Date.now());
+  const j=Math.floor(r/86400000); r-=j*86400000;
+  const h=Math.floor(r/3600000);  r-=h*3600000;
+  const m=Math.floor(r/60000);    r-=m*60000;
+  const s=Math.floor(r/1000);
+  const b=(v,u)=>'<div><div class="v num">'+String(v).padStart(2,"0")+'</div><div class="u">'+u+'</div></div>';
+  c.innerHTML = b(j,"jours")+b(h,"h")+b(m,"min")+b(s,"sec");
+}
+
+/* ---------- Affichage : épreuves ---------- */
+function comptesVotes(id){
   let a=0,b=0;
   for(const p in joueurs){
-    const v = (joueurs[p].votes||{})[idDefi];
-    if(v==="1") a++; else if(v==="2") b++;
+    const v=(joueurs[p].votes||{})[id];
+    if(v==="1")a++; else if(v==="2")b++;
   }
   return {a,b,total:a+b};
 }
-function mesParis(idDefi){
-  if(!moi || !joueurs[moi]) return [];
-  return (joueurs[moi].paris||[]).filter(p=>p.defi===idDefi);
-}
-
-// qui s'est rangé de quel côté, et pour combien
-function positions(idDefi){
-  const par = {"1":{}, "2":{}};
+function positions(id){
+  const par={"1":{},"2":{}};
   for(const p in joueurs){
-    const v = (joueurs[p].votes||{})[idDefi];
-    if(v === "1" || v === "2") par[v][p] = {p, vote:true, mise:0};
+    const v=(joueurs[p].votes||{})[id];
+    if(v==="1"||v==="2") par[v][p]={p,mise:0};
     for(const x of (joueurs[p].paris||[])){
-      if(x.defi !== idDefi) continue;
-      if(!par[x.camp][p]) par[x.camp][p] = {p, vote:false, mise:0};
+      if(x.defi!==id) continue;
+      if(!par[x.camp][p]) par[x.camp][p]={p,mise:0};
       par[x.camp][p].mise += x.mise;
     }
   }
-  const tri = o => Object.values(o).sort((a,b)=> b.mise - a.mise || a.p.localeCompare(b.p));
+  const tri=o=>Object.values(o).sort((a,b)=>b.mise-a.mise||a.p.localeCompare(b.p));
   return {a:tri(par["1"]), b:tri(par["2"])};
+}
+function mesParis(id){
+  if(!moi||!joueurs[moi]) return [];
+  return (joueurs[moi].paris||[]).filter(p=>p.defi===id);
 }
 
 function rendreDefis(){
-  const hote = $("#liste-defis");
-  hote.innerHTML = "";
+  const hote = $("#grille-defis");
   const [n1,n2] = etat.noms;
-  const tries = [...etat.defis].sort((a,b)=>{
-    const fa = !!a.resultat, fb = !!b.resultat;
-    if(fa !== fb) return fa ? 1 : -1;
+  let liste = [...etat.defis];
+  if(filtre==="ouvert") liste = liste.filter(d=>!d.resultat).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  else if(filtre==="fini") liste = liste.filter(d=>d.resultat).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  else liste.sort((a,b)=>{
+    const fa=!!a.resultat, fb=!!b.resultat;
+    if(fa!==fb) return fa?1:-1;
     return new Date(a.date)-new Date(b.date);
   });
-  if(!tries.length){
-    hote.innerHTML = '<div class="vide">Aucun défi pour l\'instant. Les organisateurs ouvrent le bal.</div>';
+
+  if(!liste.length){
+    hote.innerHTML = '<div class="vide" style="grid-column:1/-1"><strong>'
+      + (filtre==="fini" ? "Aucun résultat pour l'instant" : "Aucune épreuve au programme")
+      + '</strong>' + (filtre==="fini" ? "Les premiers verdicts arriveront après la première épreuve."
+                                       : "Les organisateurs ouvrent le calendrier depuis leur poste.") + '</div>';
     return;
   }
 
-  for(const d of tries){
-    const carte = el("article","defi"+(d.resultat?" termine":""));
-    const peutJouer = ouvert(d);
+  hote.innerHTML = "";
+  for(const d of liste){
+    const jouable = ouvert(d);
+    const live = !d.resultat && estPasse(d.date);
+    const [p1,p2] = probas(d.c1,d.c2);
     const v = comptesVotes(d.id);
-    const monVote = moi && joueurs[moi] ? (joueurs[moi].votes||{})[d.id] : null;
+    const pos = positions(d.id);
+    const carte = el("article","defi"+(d.resultat?" fini":""));
 
-    /* en-tête */
-    const tete = el("div","defi-tete");
-    const gauche = el("div");
-    gauche.appendChild(el("h3",null,d.sport));
-    gauche.appendChild(el("span","quand",dateLisible(d.date)));
-    tete.appendChild(gauche);
-    const badge = el("span","etiquette "+(d.resultat?"ferme":(peutJouer?"ouvert":"direct")),
-      d.resultat ? (d.resultat==="annule"?"Annulé":"Terminé") : (peutJouer?"Paris ouverts":"Paris fermés"));
-    tete.appendChild(badge);
-    carte.appendChild(tete);
-    if(d.regle) carte.appendChild(el("p","regle",d.regle));
+    const pil = '<span class="pil '+(d.resultat?"clos":live?"direct":"ouvert")+'">'
+      + (live?'<i class="point"></i>':'')
+      + (d.resultat ? (d.resultat==="annule"?"annulée":"terminée") : live?"en direct":"paris ouverts")+'</span>';
+
+    if(d.photo){
+      const ban = el("div","banniere");
+      ban.innerHTML = '<img src="'+d.photo+'" alt="">'+pil
+        + '<div class="titre-sur"><h3>'+echappe(d.sport)+'</h3></div>';
+      carte.appendChild(ban);
+    }else{
+      const sp = el("div","sans-photo");
+      sp.innerHTML = '<h3>'+echappe(d.sport)+'</h3>'+pil;
+      carte.appendChild(sp);
+    }
+
+    const corps = el("div","corps");
+    const attente = delai(d.date);
+    corps.innerHTML = '<div class="meta"><span>'+dateLisible(d.date)+'</span>'
+      + (attente && !d.resultat ? '<i class="sep"></i><span>'+attente+'</span>' : '')
+      + (v.total ? '<i class="sep"></i><span>'+v.total+' pronostic'+(v.total>1?"s":"")+'</span>' : '')+'</div>'
+      + (d.regle ? '<p class="regle">'+echappe(d.regle)+'</p>' : '');
 
     /* les deux cotes */
-    const duel = el("div","duel");
-    [["1",n1,d.c1,"n"],["2",n2,d.c2,"t"]].forEach(([camp,nom,cote,cl],i)=>{
-      if(i===1) duel.appendChild(el("div","milieu","vs"));
-      const b = el("button","cote "+cl+(d.resultat===camp?" gagnant":""));
-      b.type = "button";
-      b.innerHTML = '<span class="qui">'+echappe(nom)+'</span><span class="val num">'+Number(cote).toFixed(2)+'</span>';
-      b.setAttribute("aria-pressed", choix[d.id]===camp ? "true":"false");
-      if(!peutJouer) b.disabled = true;
-      else b.addEventListener("click", ()=>{ choix[d.id] = choix[d.id]===camp ? null : camp; rendreDefis(); });
-      duel.appendChild(b);
+    const paire = el("div","paire");
+    [["1",n1,d.c1,p1,"un",0],["2",n2,d.c2,p2,"deux",1]].forEach(([camp,nom,cote,pr,cl,idx])=>{
+      const b = el("button","choix "+cl+(d.resultat===camp?" vainqueur":""));
+      b.type="button";
+      const port = (etat.photos||[])[idx];
+      b.innerHTML = '<div class="haut">'
+        + (port ? '<span class="av s"><img src="'+port+'" alt=""></span>' : '<span class="av s">'+echappe(nom.charAt(0).toUpperCase())+'</span>')
+        + '<span class="qui">'+echappe(nom)+'</span></div>'
+        + '<div class="bas"><span class="cote num">'+Number(cote).toFixed(2)+'</span><span class="proba num">'+pr+'%</span></div>';
+      b.setAttribute("aria-pressed", panier && panier.defi===d.id && panier.camp===camp ? "true":"false");
+      if(!jouable) b.disabled = true;
+      else b.addEventListener("click", ()=>ouvrirPanier(d.id,camp));
+      paire.appendChild(b);
     });
-    carte.appendChild(duel);
+    corps.appendChild(paire);
 
-    /* sondage */
-    const son = el("div","sondage");
-    const barre = el("div","barre");
+    /* opinion du public */
+    const op = el("div","opinion");
     const pa = v.total ? Math.round(v.a/v.total*100) : 50;
-    const bn = el("i","bn"); bn.style.width = (v.total?pa:50)+"%";
-    const bt = el("i","bt"); bt.style.width = (v.total?100-pa:50)+"%";
-    if(!v.total){ bn.style.opacity=".25"; bt.style.opacity=".25"; }
-    barre.append(bn,bt);
-    son.appendChild(barre);
-    const leg = el("div","legende");
-    leg.appendChild(el("span",null, v.total ? n1+" "+pa+"%" : "Aucun pronostic"));
-    leg.appendChild(el("span",null, v.total ? (100-pa)+"% "+n2 : (peutJouer?"Sois le premier":"")));
-    son.appendChild(leg);
-    carte.appendChild(son);
+    op.innerHTML = '<div class="rail"><i style="width:'+pa+'%;background:var(--un)'+(v.total?"":";opacity:.25")+'"></i>'
+      + '<i style="width:'+(100-pa)+'%;background:var(--deux)'+(v.total?"":";opacity:.25")+'"></i></div>'
+      + '<div class="mots"><span>'+(v.total? pa+"% "+echappe(n1) : "Le public n'a pas encore tranché")+'</span>'
+      + '<span>'+(v.total? (100-pa)+"% "+echappe(n2) : "")+'</span></div>';
+    corps.appendChild(op);
+
+    /* pronostic gratuit */
+    const monVote = moi && joueurs[moi] ? (joueurs[moi].votes||{})[d.id] : null;
+    if(jouable && !monVote){
+      const ligne = el("div","actions");
+      [["1",n1],["2",n2]].forEach(([camp,nom])=>{
+        const bp = el("button","btn fantome","Je vois "+nom);
+        bp.type="button"; bp.style.flex="1"; bp.style.fontSize=".82rem";
+        bp.addEventListener("click",()=>voter(d.id,camp));
+        ligne.appendChild(bp);
+      });
+      corps.appendChild(ligne);
+    }else if(monVote){
+      corps.appendChild(el("p","regle","Votre pronostic : "+(monVote==="1"?n1:n2)+"."));
+    }
 
     /* qui s'est rangé de quel côté */
-    const pos = positions(d.id);
     if(pos.a.length || pos.b.length){
-      const camps = el("div","camps");
-      [[pos.a,n1,"n"],[pos.b,n2,"t"]].forEach(([gens,nom,cl])=>{
-        const col = el("div");
-        col.appendChild(el("h4",null,"Avec "+nom));
-        const puces = el("div","puces");
-        if(!gens.length) puces.appendChild(el("span","aucun","personne"));
-        gens.forEach(g=>{
-          const pu = el("span","puce "+cl+(g.p===moi?" moi":""));
-          pu.innerHTML = echappe(g.p) + (g.mise ? ' <b>'+nb(g.mise)+'</b>' : '');
-          if(g.mise) pu.title = g.p+" a misé "+nb(g.mise)+" points sur "+nom;
-          puces.appendChild(pu);
+      const gens = el("div","gens");
+      [[pos.a,n1,"un"],[pos.b,n2,"deux"]].forEach(([liste,nom,cl])=>{
+        const col = el("div","col");
+        col.innerHTML = '<h5>'+echappe(nom)+'</h5>';
+        const jet = el("div","jetons-gens");
+        if(!liste.length) jet.innerHTML = '<span class="regle">personne</span>';
+        liste.slice(0,6).forEach(g=>{
+          const t = el("span","tag "+cl);
+          t.innerHTML = avatarHTML(g.p,"s")+'<span class="nomtag">'+echappe(g.p)+'</span>'
+                      + (g.mise? ' <b>'+nb(g.mise)+'</b>' : '');
+          jet.appendChild(t);
         });
-        col.appendChild(puces);
-        camps.appendChild(col);
+        if(liste.length>6) jet.appendChild(el("span","regle","+"+(liste.length-6)));
+        col.appendChild(jet);
+        gens.appendChild(col);
       });
-      carte.appendChild(camps);
+      corps.appendChild(gens);
     }
 
-    /* pronostic + mise */
-    if(peutJouer){
-      const camp = choix[d.id];
-      const zone = el("div","mise");
-      if(!moi){
-        zone.appendChild(el("span","regle","Entre un pseudo en haut de page pour pronostiquer et miser."));
-      }else if(!camp){
-        zone.appendChild(el("span","regle", monVote
-          ? "Ton pronostic : "+(monVote==="1"?n1:n2)+". Choisis un camp ci-dessus pour miser."
-          : "Choisis un camp ci-dessus."));
-      }else{
-        const nomCamp = camp==="1"?n1:n2;
-        const cote = camp==="1"?d.c1:d.c2;
-        if(!monVote){
-          const bp = el("button","bouton creux","Pronostiquer "+nomCamp+" (+"+BONUS_VOTE+" pts)");
-          bp.type="button";
-          bp.addEventListener("click", ()=>voter(d.id,camp));
-          zone.appendChild(bp);
-        }
-        const champ = el("input","champ num");
-        champ.type="number"; champ.min="1"; champ.step="1"; champ.placeholder="Mise";
-        champ.id = "mise-"+d.id;
-        zone.appendChild(champ);
-        const jetons = el("div","jetons");
-        [50,100,250].forEach(x=>{
-          const jb = el("button","jeton",x+"");
-          jb.type="button";
-          jb.addEventListener("click",()=>{ champ.value=x; majRetour(d.id,cote); });
-          jetons.appendChild(jb);
-        });
-        const tout = el("button","jeton","tout");
-        tout.type="button";
-        tout.addEventListener("click",()=>{ champ.value=solde(moi); majRetour(d.id,cote); });
-        jetons.appendChild(tout);
-        zone.appendChild(jetons);
-        const bm = el("button","bouton","Miser sur "+nomCamp);
-        bm.type="button";
-        bm.addEventListener("click", ()=>parier(d.id,camp,cote));
-        zone.appendChild(bm);
-        champ.addEventListener("input",()=>majRetour(d.id,cote));
-        const retour = el("div","retour"); retour.id = "retour-"+d.id;
-        carte.appendChild(zone);
-        carte.appendChild(retour);
-        zone.dataset.pose = "1";
-      }
-      if(!zone.dataset.pose) carte.appendChild(zone);
-    }
-
-    /* mes tickets */
+    /* mes tickets sur cette épreuve */
     for(const p of mesParis(d.id)){
       const st = etatPari(p);
-      const nomCamp = p.camp==="1"?n1:n2;
-      const t = el("div","ticket "+(st==="gagne"?"gagne":st==="perdu"?"perdu":""));
+      const t = el("div","mon-ticket");
       const gain = Math.floor(p.mise*p.cote);
-      t.innerHTML = st==="gagne"  ? "Ticket gagnant : "+nb(p.mise)+" pts sur "+echappe(nomCamp)+" · <b>+"+nb(gain)+" pts</b>"
-                  : st==="perdu"  ? "Ticket perdu : "+nb(p.mise)+" pts sur "+echappe(nomCamp)
-                  : st==="rembourse" ? "Défi annulé : "+nb(p.mise)+" pts remboursés"
-                  : "En jeu : "+nb(p.mise)+" pts sur "+echappe(nomCamp)+" à "+p.cote.toFixed(2)+" · retour possible <b>"+nb(gain)+" pts</b>";
-      carte.appendChild(t);
+      t.innerHTML = '<span>Votre mise · <b>'+nb(p.mise)+' pts</b> sur '+echappe(p.camp==="1"?n1:n2)+'</span>'
+        + '<span>'+(st==="gagne" ? '<b style="color:var(--vert)">+'+nb(gain-p.mise)+'</b>'
+                  : st==="perdu" ? '<b style="color:var(--rouge)">−'+nb(p.mise)+'</b>'
+                  : st==="rembourse" ? 'remboursée'
+                  : 'retour '+nb(gain)+' pts')+'</span>';
+      corps.appendChild(t);
     }
 
     /* verdict */
     if(d.resultat){
-      const cl = d.resultat==="1"?"n":d.resultat==="2"?"t":"nul";
-      const texte = d.resultat==="annule" ? "Défi annulé, mises remboursées"
-                  : (d.resultat==="1"?n1:n2) + " remporte le défi";
-      carte.appendChild(el("div","verdict "+cl,texte));
+      const r = el("div","resultat-bloc");
+      const texte = d.resultat==="annule" ? "Épreuve annulée, mises remboursées"
+                  : (d.resultat==="1"?n1:n2)+" l'emporte";
+      const coul = d.resultat==="1" ? "var(--un)" : d.resultat==="2" ? "var(--deux)" : "var(--faible)";
+      r.innerHTML = '<span class="verdict" style="color:'+coul+'">'+echappe(texte)+'</span>'
+        + (d.score ? '<span class="marque-score num">'+echappe(d.score)+'</span>' : '');
+      corps.appendChild(r);
+      if(d.note) corps.appendChild(el("p","regle",d.note));
     }
 
+    carte.appendChild(corps);
     hote.appendChild(carte);
   }
 }
-function majRetour(idDefi, cote){
-  const champ = document.getElementById("mise-"+idDefi);
-  const zone  = document.getElementById("retour-"+idDefi);
-  if(!champ || !zone) return;
-  const m = parseInt(champ.value,10);
-  zone.innerHTML = (!m || m<1) ? "" :
-    "Retour si tu gagnes : <b>"+nb(m*cote)+" points</b> (bénéfice "+nb(m*cote-m)+")";
-}
 
-/* ---------- Actions du joueur ---------- */
-async function voter(idDefi, camp){
-  const d = defiPar(idDefi);
-  if(!d || !ouvert(d)) return message("Les pronostics sont fermés sur ce défi.", true);
-  await sauverMonJoueur(j => { j.votes = j.votes||{}; if(!j.votes[idDefi]) j.votes[idDefi]=camp; return j; });
-  message("Pronostic enregistré, +"+BONUS_VOTE+" points.");
+async function voter(id, camp){
+  const d = defiPar(id);
+  if(!d || !ouvert(d)) return note("Les pronostics sont fermés sur cette épreuve.", true);
+  await sauverMonJoueur(j=>{ j.votes=j.votes||{}; if(!j.votes[id]) j.votes[id]=camp; return j; });
+  note("Pronostic enregistré.");
   toutRendre();
 }
-async function parier(idDefi, camp, cote){
-  const d = defiPar(idDefi);
-  if(!d || !ouvert(d)) return message("Les paris sont fermés sur ce défi.", true);
-  const champ = document.getElementById("mise-"+idDefi);
-  const mise = parseInt(champ && champ.value, 10);
-  if(!mise || mise < 1) return message("Indique une mise d'au moins 1 point.", true);
-  if(mise > solde(moi)) return message("Tu n'as que "+nb(solde(moi))+" points.", true);
-  await sauverMonJoueur(j => {
+
+/* ---------- Panier de pari ---------- */
+function ouvrirPanier(id, camp){
+  if(panier && panier.defi===id && panier.camp===camp) return fermerPanier();
+  panier = {defi:id, camp};
+  const d = defiPar(id);
+  const cote = camp==="1" ? d.c1 : d.c2;
+  const nom  = camp==="1" ? etat.noms[0] : etat.noms[1];
+  $("#panier-sel").className = "sel " + (camp==="1"?"un":"deux");
+  $("#panier-bulle").textContent = Number(cote).toFixed(2);
+  $("#panier-camp").textContent = nom;
+  $("#panier-epreuve").textContent = d.sport;
+  $("#panier-mise").value = "";
+  majRetour();
+  $("#panier").classList.add("ouvert");
+  setTimeout(()=>$("#panier-mise").focus(), 60);
+  rendreDefis();
+}
+function fermerPanier(){
+  panier = null;
+  $("#panier").classList.remove("ouvert");
+  rendreDefis();
+}
+function majRetour(){
+  if(!panier) return;
+  const d = defiPar(panier.defi);
+  if(!d) return;
+  const cote = panier.camp==="1" ? d.c1 : d.c2;
+  const m = parseInt($("#panier-mise").value,10) || 0;
+  $("#panier-retour").textContent = nb(m*cote)+" pts";
+}
+async function validerPari(){
+  if(!panier) return;
+  const d = defiPar(panier.defi);
+  if(!d || !ouvert(d)){ fermerPanier(); return note("Les paris sont fermés sur cette épreuve.", true); }
+  const mise = parseInt($("#panier-mise").value,10);
+  if(!mise || mise < 1) return note("Indiquez une mise d'au moins 1 point.", true);
+  if(mise > solde(moi)) return note("Vous n'avez que "+nb(solde(moi))+" points.", true);
+  const cote = panier.camp==="1" ? d.c1 : d.c2;
+  const camp = panier.camp, id = panier.defi;
+  await sauverMonJoueur(j=>{
     j.paris = j.paris||[];
-    j.paris.push({defi:idDefi, camp, mise, cote:Number(cote), date:Date.now()});
+    j.paris.push({defi:id, camp, mise, cote:Number(cote), date:Date.now()});
     return j;
   });
-  choix[idDefi] = null;
-  message("Mise de "+nb(mise)+" points enregistrée.");
+  note("Pari validé · "+nb(mise)+" pts sur "+(camp==="1"?etat.noms[0]:etat.noms[1])+".");
+  fermerPanier();
   toutRendre();
 }
 
 /* ---------- Mes paris ---------- */
-function rendreMesParis(){
-  const resume = $("#resume-paris"), liste = $("#liste-tickets");
-  if(!moi){ resume.innerHTML = ""; liste.innerHTML = ""; return; }
+function rendreTickets(){
+  const stats = $("#stats"), liste = $("#tickets");
+  if(!moi){ stats.innerHTML=""; liste.innerHTML=""; return; }
   const [n1,n2] = etat.noms;
   const tous = (joueurs[moi] && joueurs[moi].paris) ? [...joueurs[moi].paris] : [];
-  tous.sort((a,b)=> (b.date||0) - (a.date||0));
-
-  const enJeu  = tous.filter(p=>etatPari(p)==="attente").reduce((s,p)=>s+p.mise,0);
+  tous.sort((a,b)=>(b.date||0)-(a.date||0));
+  const enJeu = tous.filter(p=>etatPari(p)==="attente").reduce((s,p)=>s+p.mise,0);
   const regles = tous.filter(p=>["gagne","perdu"].indexOf(etatPari(p))>-1);
   const gagnes = regles.filter(p=>etatPari(p)==="gagne");
-  const bilan  = regles.reduce((s,p)=> s + (etatPari(p)==="gagne" ? Math.floor(p.mise*p.cote)-p.mise : -p.mise), 0);
+  const bilan = regles.reduce((s,p)=>s+(etatPari(p)==="gagne"?Math.floor(p.mise*p.cote)-p.mise:-p.mise),0);
 
-  resume.innerHTML =
+  stats.innerHTML =
       '<div class="stat or"><div class="v num">'+nb(solde(moi))+'</div><div class="u">points disponibles</div></div>'
-    + '<div class="stat"><div class="v num">'+nb(enJeu)+'</div><div class="u">engagés sur des défis</div></div>'
+    + '<div class="stat"><div class="v num">'+nb(enJeu)+'</div><div class="u">engagés en ce moment</div></div>'
     + '<div class="stat"><div class="v num">'+(regles.length? gagnes.length+"/"+regles.length : "—")+'</div><div class="u">tickets gagnés</div></div>'
     + '<div class="stat '+(bilan>0?"vert":bilan<0?"rouge":"")+'"><div class="v num">'
-      + (bilan>0?"+":bilan<0?"−":"")+nb(Math.abs(bilan))+'</div><div class="u">bilan sur les défis joués</div></div>';
+      +(bilan>0?"+":bilan<0?"−":"")+nb(Math.abs(bilan))+'</div><div class="u">bilan des épreuves jouées</div></div>';
 
   if(!tous.length){
-    liste.innerHTML = '<div class="vide">Aucun ticket pour l\'instant. Choisis un camp sur un défi et pose tes points.</div>';
+    liste.innerHTML = '<div class="vide"><strong>Aucun ticket pour l\'instant</strong>Choisissez un camp sur une épreuve et posez vos points.</div>';
     return;
   }
-
-  const rendreSlip = p => {
-    const st = etatPari(p);
-    const d  = defiPar(p.defi);
-    const sport = d ? d.sport : "Défi retiré du calendrier";
-    const nom = p.camp==="1" ? n1 : n2;
+  const slip = p=>{
+    const st = etatPari(p), d = defiPar(p.defi);
     const retour = Math.floor(p.mise*p.cote);
-    const issue = st==="gagne"     ? "+"+nb(retour-p.mise)
-                : st==="perdu"     ? "−"+nb(p.mise)
+    const issue = st==="gagne" ? "+"+nb(retour-p.mise)
+                : st==="perdu" ? "−"+nb(p.mise)
                 : st==="rembourse" ? "remboursé"
-                : "+"+nb(retour-p.mise)+" possible";
-    const quand = p.date ? new Date(p.date).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})
-                         + " à " + new Date(p.date).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "";
-    return '<div class="slip '+st+'">'
-      + '<div><div class="quoi">'+echappe(sport)+' · '+echappe(nom)+'</div>'
-      + '<div class="detail">'+nb(p.mise)+' points à la cote '+p.cote.toFixed(2)
-      + ' · retour '+nb(retour)+(quand?' · misé le '+quand:'')+'</div></div>'
-      + '<div class="issue">'+issue+'</div></div>';
+                : nb(retour)+" pts";
+    const quand = p.date ? new Date(p.date).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}) : "";
+    return '<div class="ticket '+st+'">'
+      + '<div class="info"><div class="quoi">'+echappe(d?d.sport:"Épreuve retirée")+' · '+echappe(p.camp==="1"?n1:n2)+'</div>'
+      + '<div class="detail">'+nb(p.mise)+' pts à '+p.cote.toFixed(2)+(quand?' · misé le '+quand:'')+'</div></div>'
+      + '<div class="issue num">'+issue+'</div></div>';
   };
-
-  const attente = tous.filter(p=>etatPari(p)==="attente");
-  const finis   = tous.filter(p=>etatPari(p)!=="attente");
-  let html = "";
-  if(attente.length) html += '<div class="groupe-tickets"><h3>En cours · '+attente.length+' ticket'+(attente.length>1?"s":"")+'</h3>'+attente.map(rendreSlip).join("")+'</div>';
-  if(finis.length)   html += '<div class="groupe-tickets"><h3>Réglés</h3>'+finis.map(rendreSlip).join("")+'</div>';
-  liste.innerHTML = html;
+  const att = tous.filter(p=>etatPari(p)==="attente");
+  const fin = tous.filter(p=>etatPari(p)!=="attente");
+  let h = "";
+  if(att.length) h += '<div class="groupe"><h3>En cours · '+att.length+'</h3>'+att.map(slip).join("")+'</div>';
+  if(fin.length) h += '<div class="groupe"><h3>Réglés</h3>'+fin.map(slip).join("")+'</div>';
+  liste.innerHTML = h;
 }
 
 /* ---------- Classement ---------- */
 function rendreClassement(){
-  const hote = $("#tableau-classement");
+  const hote = $("#liste-classement");
   const lignes = Object.keys(joueurs).map(p=>{
     const paris = joueurs[p].paris||[];
     const gagnes = paris.filter(x=>etatPari(x)==="gagne").length;
-    const joues  = paris.filter(x=>["gagne","perdu"].includes(etatPari(x))).length;
-    const enjeu  = paris.filter(x=>etatPari(x)==="attente").reduce((s,x)=>s+x.mise,0);
-    return {p, solde:solde(p), paris:paris.length, gagnes, joues, enjeu};
-  }).sort((a,b)=> b.solde - a.solde || b.gagnes - a.gagnes);
+    const joues  = paris.filter(x=>["gagne","perdu"].indexOf(etatPari(x))>-1).length;
+    return {p, solde:solde(p), joues, gagnes, paris:paris.length};
+  }).sort((a,b)=>b.solde-a.solde||b.gagnes-a.gagnes);
 
   if(!lignes.length){
-    hote.innerHTML = '<div class="vide">Personne n\'a encore pris position. Entre ton pseudo et ouvre le bal.</div>';
+    hote.innerHTML = '<div class="vide"><strong>Classement vide</strong>Personne n\'a encore pris position.</div>';
     return;
   }
-  let html = '<table><thead><tr><th class="rang"></th><th>Parieur</th><th class="n">Solde</th><th class="n">En jeu</th><th class="n">Paris gagnés</th></tr></thead><tbody>';
-  lignes.forEach((l,i)=>{
-    html += '<tr class="'+(l.p===moi?"moi":"")+'">'
-      + '<td class="rang">'+(i+1)+'</td>'
-      + '<td>'+echappe(l.p)+(l.p===moi?' <span style="color:var(--or);font-size:.8em">toi</span>':'')+'</td>'
-      + '<td class="n">'+nb(l.solde)+'</td>'
-      + '<td class="n">'+(l.enjeu?nb(l.enjeu):"—")+'</td>'
-      + '<td class="n">'+(l.joues?l.gagnes+" / "+l.joues:"—")+'</td>'
-      + '</tr>';
-  });
-  html += '</tbody></table>';
-  hote.innerHTML = html;
+  hote.innerHTML = '<div class="classement">' + lignes.map((l,i)=>{
+    const d = l.solde - DEPART;
+    return '<div class="ligne-c '+(l.p===moi?"moi ":"")+"podium"+(i+1)+'">'
+      + '<div class="rang num">'+(i+1)+'</div>'
+      + avatarHTML(l.p,"m")
+      + '<div class="qui"><div class="pseudo">'+echappe(l.p)+(l.p===moi?' <span class="faible">vous</span>':'')+'</div>'
+      + '<div class="sous">'+(l.paris? l.paris+" pari"+(l.paris>1?"s":"")+(l.joues? " · "+l.gagnes+"/"+l.joues+" gagnés":"") : "aucun pari")+'</div></div>'
+      + '<div style="text-align:right"><div class="solde num">'+nb(l.solde)+'</div>'
+      + '<div class="delta '+(d>0?"plus":d<0?"moins":"")+'">'+(d>0?"+":d<0?"−":"")+nb(Math.abs(d))+'</div></div>'
+      + '</div>';
+  }).join("") + '</div>';
 }
 
-/* ---------- Espace organisateurs ---------- */
-function rendreBarreOrga(){
-  const barre = document.getElementById("barre-orga");
-  if(barre) barre.classList.toggle("visible", estOrga);
+/* ---------- Profil ---------- */
+function rendreProfil(){
+  if(!moi) return;
+  $("#profil-pseudo").textContent = moi;
+  $("#profil-solde").textContent = nb(solde(moi))+" pts";
+  const paris = (joueurs[moi] && joueurs[moi].paris) || [];
+  const joues = paris.filter(x=>["gagne","perdu"].indexOf(etatPari(x))>-1).length;
+  const gagnes = paris.filter(x=>etatPari(x)==="gagne").length;
+  $("#profil-ratio").textContent = joues ? gagnes+" / "+joues : "—";
+  montrerApercu("profil-apercu", (joueurs[moi]||{}).photo || null);
 }
 
-// ce que le public a misé, défi par défi : la base pour ajuster les cotes
-function misesParDefi(idDefi){
-  let m1=0, m2=0, tickets=0;
-  for(const p in joueurs){
-    for(const x of (joueurs[p].paris||[])){
-      if(x.defi!==idDefi) continue;
-      tickets++;
-      if(x.camp==="1") m1 += x.mise; else m2 += x.mise;
-    }
+/* ---------- Poste des organisateurs ---------- */
+function rendreBarreOrga(){ $("#barre-orga").classList.toggle("visible", estOrga); }
+
+function misesParDefi(id){
+  let m1=0,m2=0,s1=0,s2=0,t=0;
+  for(const p in joueurs) for(const x of (joueurs[p].paris||[])){
+    if(x.defi!==id) continue;
+    t++;
+    if(x.camp==="1"){ m1+=x.mise; s1+=x.mise*x.cote; } else { m2+=x.mise; s2+=x.mise*x.cote; }
   }
-  let sortie1=0, sortie2=0;
-  for(const p in joueurs){
-    for(const x of (joueurs[p].paris||[])){
-      if(x.defi!==idDefi) continue;
-      if(x.camp==="1") sortie1 += x.mise*x.cote; else sortie2 += x.mise*x.cote;
-    }
-  }
-  return {m1,m2,tickets,sortie1,sortie2};
+  return {m1,m2,s1,s2,t};
 }
 function rendreTableauMises(){
-  const hote = document.getElementById("admin-tableau");
-  if(!hote) return;
+  const hote = $("#tableau-mises");
   const [n1,n2] = etat.noms;
   const ouverts = etat.defis.filter(d=>!d.resultat);
-  if(!ouverts.length){ hote.innerHTML = '<p class="mot">Aucun défi en attente de résultat.</p>'; return; }
-  let html = '<table><thead><tr><th>Défi</th><th class="n">Pronostics</th><th class="n">Misé sur '+echappe(n1)
-           + '</th><th class="n">Misé sur '+echappe(n2)+'</th><th class="n">Si '+echappe(n1)
-           + ' gagne</th><th class="n">Si '+echappe(n2)+' gagne</th></tr></thead><tbody>';
+  if(!ouverts.length){ hote.innerHTML = '<p class="mot">Aucune épreuve en attente de résultat.</p>'; return; }
+  let h = '<table><thead><tr><th>Épreuve</th><th class="n">Pronostics</th><th class="n">Misé '+echappe(n1)
+        + '</th><th class="n">Misé '+echappe(n2)+'</th><th class="n">Si '+echappe(n1)+'</th><th class="n">Si '+echappe(n2)+'</th></tr></thead><tbody>';
   for(const d of ouverts){
     const m = misesParDefi(d.id), v = comptesVotes(d.id);
-    const bal1 = m.m1 + m.m2 - m.sortie1, bal2 = m.m1 + m.m2 - m.sortie2;
-    const signe = x => (x>=0?"+":"−") + nb(Math.abs(x));
-    html += '<tr><td>'+echappe(d.sport)+'</td>'
-      + '<td class="n">'+(v.total? v.a+" / "+v.b : "—")+'</td>'
+    const b1 = m.m1+m.m2-m.s1, b2 = m.m1+m.m2-m.s2;
+    const sg = x => '<span style="color:'+(x>=0?"var(--vert)":"var(--rouge)")+'">'+(x>=0?"+":"−")+nb(Math.abs(x))+'</span>';
+    h += '<tr><td>'+echappe(d.sport)+'</td><td class="n">'+(v.total? v.a+" / "+v.b : "—")+'</td>'
       + '<td class="n">'+nb(m.m1)+'</td><td class="n">'+nb(m.m2)+'</td>'
-      + '<td class="n">'+signe(bal1)+'</td><td class="n">'+signe(bal2)+'</td></tr>';
+      + '<td class="n">'+sg(b1)+'</td><td class="n">'+sg(b2)+'</td></tr>';
   }
-  hote.innerHTML = html + '</tbody></table>'
-    + '<p class="mot">Les deux dernières colonnes disent ce que la banque gagne ou perd selon le vainqueur. Si un camp est trop chargé, baisse sa cote.</p>';
+  hote.innerHTML = h+'</tbody></table><p class="mot" style="margin:12px 0 0">Les deux dernières colonnes indiquent ce que la banque gagne ou perd selon le vainqueur. Si un camp est trop chargé, baissez sa cote.</p>';
+}
+function rendreSelectsResultat(){
+  const sd = $("#r-defi"), sv = $("#r-vainqueur");
+  const [n1,n2] = etat.noms;
+  const avant = sd.value;
+  sd.innerHTML = [...etat.defis]
+    .sort((a,b)=>new Date(a.date)-new Date(b.date))
+    .map(d=>'<option value="'+d.id+'">'+echappe(d.sport)+(d.resultat?" (déjà publié)":"")+'</option>').join("");
+  if(avant) sd.value = avant;
+  sv.innerHTML = '<option value="1">'+echappe(n1)+'</option><option value="2">'+echappe(n2)+'</option>'
+               + '<option value="annule">Annulée (remboursement)</option>';
 }
 function rendreJoueursAdmin(){
-  const hote = document.getElementById("admin-joueurs");
-  if(!hote) return;
+  const hote = $("#admin-joueurs");
   const noms = Object.keys(joueurs);
-  if(!noms.length){ hote.innerHTML = '<p class="mot">Personne n\'a encore rejoint le jeu.</p>'; return; }
+  if(!noms.length){ hote.innerHTML = '<p class="mot">Personne n\'a encore rejoint.</p>'; return; }
   hote.innerHTML = "";
-  for(const p of noms.sort((a,b)=>solde(b)-solde(a))){
-    const l = el("div","ligne-admin");
-    l.style.display="flex"; l.style.justifyContent="space-between";
-    l.style.alignItems="center"; l.style.gap="12px"; l.style.flexWrap="wrap";
-    const g = el("div");
-    g.innerHTML = '<strong>'+echappe(p)+'</strong> <span class="mot">· '+nb(solde(p))+' points · '
-                + ((joueurs[p].paris||[]).length)+' paris · '
-                + Object.keys(joueurs[p].votes||{}).length+' pronostics</span>';
-    const b = el("button","bouton creux danger","Retirer");
+  noms.sort((a,b)=>solde(b)-solde(a)).forEach(p=>{
+    const l = el("div","ligne-c");
+    l.style.padding = "10px 0";
+    l.innerHTML = avatarHTML(p,"m")
+      + '<div class="qui"><div class="pseudo">'+echappe(p)+'</div><div class="sous">'+nb(solde(p))+' pts · '
+      + ((joueurs[p].paris||[]).length)+' paris</div></div>';
+    const b = el("button","btn danger","Retirer");
     b.type="button";
     b.addEventListener("click", async ()=>{
-      if(!confirm("Retirer « "+p+" » ? Ses paris et ses pronostics disparaissent.")) return;
-      const frais = await casier.lire(CLE_JOUEURS, true, {}) || {};
+      if(!confirm("Retirer « "+p+" » ? Ses paris disparaissent.")) return;
+      const frais = await casier.lire(CLE_JOUEURS,true,{})||{};
       delete frais[p];
       joueurs = frais;
-      await casier.ecrire(CLE_JOUEURS, frais, true);
-      message("Parieur retiré."); toutRendre(); rendreAdmin();
+      await casier.ecrire(CLE_JOUEURS,frais,true);
+      note("Parieur retiré."); toutRendre(); rendreOrga();
     });
-    l.append(g,b);
+    l.appendChild(b);
     hote.appendChild(l);
-  }
+  });
 }
-
-function rendreAdmin(){
-  rendreTableauMises();
-  rendreJoueursAdmin();
+function rendreListeAdmin(){
   const hote = $("#admin-defis");
-  hote.innerHTML = "";
-  $("#a-nom1").value = etat.noms[0];
-  $("#a-nom2").value = etat.noms[1];
   const [n1,n2] = etat.noms;
-
-  if(!etat.defis.length) hote.innerHTML = '<p class="mot">Aucun défi. Ajoute le premier ci-dessous.</p>';
-
-  for(const d of [...etat.defis].sort((a,b)=> new Date(a.date)-new Date(b.date))){
-    const bloc = el("div","ligne-admin");
-    const local = new Date(d.date);
-    const valeurDate = isNaN(local) ? "" : new Date(local.getTime()-local.getTimezoneOffset()*60000).toISOString().slice(0,16);
-    bloc.innerHTML =
-      '<div class="grille-admin">'
-      + '<div><label>Sport</label><input class="champ" data-c="sport" value="'+echappe(d.sport)+'"></div>'
-      + '<div><label>Date et heure</label><input class="champ" type="datetime-local" data-c="date" value="'+valeurDate+'"></div>'
-      + '<div><label>Cote '+echappe(n1)+'</label><input class="champ" type="number" step="0.05" min="1.01" data-c="c1" value="'+d.c1+'"></div>'
-      + '<div><label>Cote '+echappe(n2)+'</label><input class="champ" type="number" step="0.05" min="1.01" data-c="c2" value="'+d.c2+'"></div>'
-      + '</div>'
-      + '<div class="grille-admin">'
-      + '<div style="grid-column:1/-1"><label>Règle</label><input class="champ" data-c="regle" value="'+echappe(d.regle||"")+'"></div>'
-      + '<div><label>Résultat</label><select class="champ" data-c="resultat">'
-        + '<option value="">Pas encore joué</option>'
+  hote.innerHTML = "";
+  if(!etat.defis.length){ hote.innerHTML = '<p class="mot">Aucune épreuve. Ajoutez la première ci-dessous.</p>'; return; }
+  [...etat.defis].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(d=>{
+    const b = el("div","bloc");
+    const loc = new Date(d.date);
+    const valeur = isNaN(loc)?"":new Date(loc.getTime()-loc.getTimezoneOffset()*60000).toISOString().slice(0,16);
+    b.innerHTML = '<div class="rangee">'
+      + '<div><label class="etiq">Nom</label><input class="champ" data-c="sport" value="'+echappe(d.sport)+'"></div>'
+      + '<div><label class="etiq">Date et heure</label><input class="champ" type="datetime-local" data-c="date" value="'+valeur+'"></div>'
+      + '<div><label class="etiq">Cote '+echappe(n1)+'</label><input class="champ num" type="number" step="0.05" min="1.01" data-c="c1" value="'+d.c1+'"></div>'
+      + '<div><label class="etiq">Cote '+echappe(n2)+'</label><input class="champ num" type="number" step="0.05" min="1.01" data-c="c2" value="'+d.c2+'"></div>'
+      + '</div><div class="rangee large"><div><label class="etiq">Règle</label><input class="champ" data-c="regle" value="'+echappe(d.regle||"")+'"></div></div>'
+      + '<div class="rangee"><div><label class="etiq">Résultat</label><select class="champ" data-c="resultat">'
+        + '<option value="">Pas encore jouée</option>'
         + '<option value="1"'+(d.resultat==="1"?" selected":"")+'>'+echappe(n1)+' gagne</option>'
         + '<option value="2"'+(d.resultat==="2"?" selected":"")+'>'+echappe(n2)+' gagne</option>'
-        + '<option value="annule"'+(d.resultat==="annule"?" selected":"")+'>Annulé (remboursé)</option>'
-      + '</select></div>'
-      + '</div>';
+        + '<option value="annule"'+(d.resultat==="annule"?" selected":"")+'>Annulée</option></select></div>'
+      + '<div><label class="etiq">Score</label><input class="champ" data-c="score" value="'+echappe(d.score||"")+'"></div>'
+      + '<div><label class="etiq">Commentaire</label><input class="champ" data-c="note" value="'+echappe(d.note||"")+'"></div></div>';
+
+    const zone = el("div","photo-champ");
+    zone.style.marginBottom = "12px";
+    const ap = el("div","apercu");
+    ap.id = "ap-"+d.id;
+    ap.innerHTML = d.photo ? '<img src="'+d.photo+'" alt="">' : "photo";
+    const bp = el("button","btn fantome","Photo");
+    bp.type="button";
+    const fi = document.createElement("input");
+    fi.type="file"; fi.accept="image/*";
+    bp.addEventListener("click",()=>fi.click());
+    fi.addEventListener("change", async ()=>{
+      try{
+        const url = await imageVers(fi.files[0], 640, 280, .74);
+        d.photo = url; ap.innerHTML = '<img src="'+url+'" alt="">';
+        await sauverEtat(); note("Photo de l'épreuve enregistrée."); rendreDefis(); rendreCompteur();
+      }catch(e){ note(e.message||"Photo refusée.", true); }
+      fi.value="";
+    });
+    const br = el("button","btn discret","Retirer la photo");
+    br.type="button";
+    br.addEventListener("click", async ()=>{
+      d.photo = null; ap.innerHTML = "photo";
+      await sauverEtat(); rendreDefis(); rendreCompteur();
+    });
+    zone.append(ap,bp,fi,br);
+    b.appendChild(zone);
+
     const actions = el("div","actions");
-    const bs = el("button","bouton","Enregistrer");
+    const bs = el("button","btn","Enregistrer");
     bs.type="button";
     bs.addEventListener("click", async ()=>{
-      const v = c => bloc.querySelector('[data-c="'+c+'"]').value;
+      const v = c => b.querySelector('[data-c="'+c+'"]').value;
       d.sport = v("sport").trim() || d.sport;
       const dt = v("date"); if(dt) d.date = new Date(dt).toISOString();
       d.c1 = Math.max(1.01, parseFloat(v("c1"))||d.c1);
       d.c2 = Math.max(1.01, parseFloat(v("c2"))||d.c2);
       d.regle = v("regle").trim();
       d.resultat = v("resultat") || null;
-      await sauverEtat(); message("Défi mis à jour."); toutRendre(); rendreAdmin();
+      d.score = v("score").trim();
+      d.note = v("note").trim();
+      await sauverEtat(); note("Épreuve mise à jour."); toutRendre(); rendreOrga();
     });
-    const bd = el("button","bouton creux danger","Supprimer");
+    const bd = el("button","btn danger","Supprimer");
     bd.type="button";
     bd.addEventListener("click", async ()=>{
       if(!confirm("Supprimer « "+d.sport+" » ? Les mises placées dessus seront remboursées.")) return;
       etat.defis = etat.defis.filter(x=>x.id!==d.id);
-      await sauverEtat(); message("Défi supprimé."); toutRendre(); rendreAdmin();
+      await sauverEtat(); note("Épreuve supprimée."); toutRendre(); rendreOrga();
     });
     actions.append(bs,bd);
-    bloc.appendChild(actions);
-    hote.appendChild(bloc);
-  }
+    b.appendChild(actions);
+    hote.appendChild(b);
+  });
+}
+function rendreOrga(){
+  if(!estOrga) return;
+  $("#a-nom1").value = etat.noms[0];
+  $("#a-nom2").value = etat.noms[1];
+  montrerApercu("apercu-a1", (etat.photos||[])[0]);
+  montrerApercu("apercu-a2", (etat.photos||[])[1]);
+  rendreSelectsResultat();
+  rendreTableauMises();
+  rendreListeAdmin();
+  rendreJoueursAdmin();
 }
 
-/* ---------- Démarrage ---------- */
+/* ---------- Cycle ---------- */
 function toutRendre(){
-  rendreEnTete(); rendreChrono(); rendreCompte(); rendreDefis(); rendreMesParis(); rendreClassement(); rendreBarreOrga();
+  rendrePortail(); rendreEnTete(); rendreCompteur();
+  rendreDefis(); rendreTickets(); rendreClassement();
+  rendreProfil(); rendreBarreOrga();
 }
-
-async function rafraichir(silencieux){
+async function actualiser(silence){
   await charger();
   toutRendre();
-  if(!silencieux) message("À jour.");
+  if(!silence){
+    if(estOrga && $("#contenu-orga").style.display === "block") rendreOrga();
+    note("Données à jour.");
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
   await charger();
   toutRendre();
-  minuteur = setInterval(rendreChrono, 1000);
-  setInterval(()=>rafraichir(true), 20000);
-  window.addEventListener("focus", ()=>rafraichir(true));
+  setInterval(rendreCompteur, 1000);
+  setInterval(()=>actualiser(true), 20000);
+  window.addEventListener("focus", ()=>actualiser(true));
 
+  /* connexion */
   $("#btn-entrer").addEventListener("click", entrer);
   $("#l-pseudo").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#l-code").focus(); });
   $("#l-code").addEventListener("keydown", e=>{ if(e.key==="Enter") entrer(); });
   $("#l-code").addEventListener("input", e=>{ e.target.value = e.target.value.replace(/\D/g,"").slice(0,4); });
-  $("#btn-sortir").addEventListener("click", async ()=>{
-    moi = null; choix = {};
-    await casier.ecrire(CLE_MOI, {}, false);
-    $("#l-erreur").textContent = "";
+
+  /* filtres */
+  $("#onglets").addEventListener("click", e=>{
+    const b = e.target.closest("button[data-f]");
+    if(!b) return;
+    filtre = b.dataset.f;
+    [...$("#onglets").children].forEach(x=>x.setAttribute("aria-selected", x===b ? "true":"false"));
+    rendreDefis();
+  });
+
+  /* panier */
+  $("#btn-fermer-panier").addEventListener("click", fermerPanier);
+  $("#panier-mise").addEventListener("input", majRetour);
+  $("#panier-mise").addEventListener("keydown", e=>{ if(e.key==="Enter") validerPari(); });
+  $("#btn-valider-pari").addEventListener("click", validerPari);
+  document.querySelectorAll(".rapides button").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      $("#panier-mise").value = b.dataset.m==="max" ? solde(moi) : b.dataset.m;
+      majRetour();
+    });
+  });
+
+  /* profil */
+  $("#btn-profil").addEventListener("click", ()=>{ rendreProfil(); $("#voile-profil").classList.add("ouvert"); });
+  $("#btn-fermer-profil").addEventListener("click", ()=>$("#voile-profil").classList.remove("ouvert"));
+  $("#voile-profil").addEventListener("click", e=>{ if(e.target.id==="voile-profil") e.currentTarget.classList.remove("ouvert"); });
+  $("#btn-actualiser").addEventListener("click", ()=>actualiser(false));
+  $("#btn-deconnexion").addEventListener("click", async ()=>{
+    moi = null; panier = null;
+    await casier.ecrire(CLE_MOI,{},false);
+    $("#voile-profil").classList.remove("ouvert");
+    $("#panier").classList.remove("ouvert");
     toutRendre();
   });
-  $("#btn-rafraichir").addEventListener("click", ()=>rafraichir(false));
+  brancherPhoto("btn-photo-profil","fichier-profil","profil-apercu",200,200, async url=>{
+    await sauverMonJoueur(j=>{ j.photo = url; return j; });
+    note("Photo de profil enregistrée."); toutRendre();
+  });
+  $("#btn-retirer-photo").addEventListener("click", async ()=>{
+    await sauverMonJoueur(j=>{ j.photo = null; return j; });
+    montrerApercu("profil-apercu", null);
+    note("Photo retirée."); toutRendre();
+  });
 
-  /* --- poste des organisateurs : entrée cachée par #orga --- */
+  /* poste des organisateurs */
   const ouvrirPoste = ()=>{
-    $("#voile-admin").classList.add("ouvert");
-    if(estOrga){
-      $("#admin-verrou").style.display="none";
-      $("#admin-contenu").style.display="block";
-      rendreAdmin();
-    }else{
-      $("#admin-verrou").style.display="block";
-      $("#admin-contenu").style.display="none";
-      setTimeout(()=>$("#code").focus(), 60);
-    }
+    $("#voile-orga").classList.add("ouvert");
+    if(estOrga){ $("#verrou").style.display="none"; $("#contenu-orga").style.display="block"; rendreOrga(); }
+    else{ $("#verrou").style.display="block"; $("#contenu-orga").style.display="none"; setTimeout(()=>$("#code").focus(),60); }
   };
-  const appelPoste = ()=> location.hash.toLowerCase()==="#orga"
-                      || location.search.toLowerCase().indexOf("orga")>-1;
-  if(appelPoste()) ouvrirPoste();
-  window.addEventListener("hashchange", ()=>{ if(appelPoste()) ouvrirPoste(); });
-  // second accès, utile là où on ne peut pas changer l'adresse : taper o-r-g-a
+  const appel = ()=> location.hash.toLowerCase()==="#orga" || location.search.toLowerCase().indexOf("orga")>-1;
+  if(appel()) ouvrirPoste();
+  window.addEventListener("hashchange", ()=>{ if(appel()) ouvrirPoste(); });
   let frappe = "";
   window.addEventListener("keydown", e=>{
     const t = e.target.tagName;
-    if(t==="INPUT" || t==="TEXTAREA" || t==="SELECT") return;
+    if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT") return;
     if(e.key.length !== 1) return;
-    frappe = (frappe + e.key.toLowerCase()).slice(-4);
-    if(frappe === "orga"){ frappe=""; ouvrirPoste(); }
+    frappe = (frappe+e.key.toLowerCase()).slice(-4);
+    if(frappe==="orga"){ frappe=""; ouvrirPoste(); }
   });
-
   $("#btn-ouvrir-orga").addEventListener("click", ouvrirPoste);
+  $("#btn-fermer-orga").addEventListener("click", ()=>$("#voile-orga").classList.remove("ouvert"));
+  $("#voile-orga").addEventListener("click", e=>{ if(e.target.id==="voile-orga") e.currentTarget.classList.remove("ouvert"); });
   $("#btn-quitter-orga").addEventListener("click", async ()=>{
     estOrga = false;
-    await casier.ecrire(CLE_ORGA, {}, false);
-    $("#voile-admin").classList.remove("ouvert");
-    message("Tu es repassé en espace joueur.");
-    toutRendre();
+    await casier.ecrire(CLE_ORGA,{},false);
+    $("#voile-orga").classList.remove("ouvert");
+    note("Retour à l'espace joueur."); toutRendre();
   });
-  $("#btn-fermer-admin").addEventListener("click", ()=>$("#voile-admin").classList.remove("ouvert"));
-  $("#voile-admin").addEventListener("click", e=>{ if(e.target.id==="voile-admin") e.currentTarget.classList.remove("ouvert"); });
   $("#btn-deverrouiller").addEventListener("click", async ()=>{
-    if(hacher($("#code").value) !== empreinteCourante()) return message("Code incorrect.", true);
+    if(hacher($("#code").value) !== empreinteCourante()) return note("Code incorrect.", true);
     estOrga = true;
-    await casier.ecrire(CLE_ORGA, {empreinte:empreinteCourante()}, false);
+    await casier.ecrire(CLE_ORGA,{empreinte:empreinteCourante()},false);
     $("#code").value = "";
-    $("#admin-verrou").style.display="none";
-    $("#admin-contenu").style.display="block";
-    rendreAdmin(); rendreBarreOrga();
+    $("#verrou").style.display="none"; $("#contenu-orga").style.display="block";
+    rendreOrga(); rendreBarreOrga();
   });
   $("#code").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#btn-deverrouiller").click(); });
-  $("#btn-changer-code").addEventListener("click", async ()=>{
-    const c = $("#nouveau-code").value.trim();
-    if(c.length < 4) return message("Quatre caractères minimum.", true);
-    etat.empreinte = hacher(c);
-    await sauverEtat();
-    await casier.ecrire(CLE_ORGA, {empreinte:etat.empreinte}, false);
-    $("#nouveau-code").value = "";
-    message("Code changé. L'ancien ne fonctionne plus.");
+
+  /* athlètes */
+  brancherPhoto("btn-photo-a1","fichier-a1","apercu-a1",300,300, async url=>{
+    etat.photos[0] = url; await sauverEtat(); note("Photo enregistrée."); toutRendre();
   });
-  $("#btn-noms").addEventListener("click", async ()=>{
+  brancherPhoto("btn-photo-a2","fichier-a2","apercu-a2",300,300, async url=>{
+    etat.photos[1] = url; await sauverEtat(); note("Photo enregistrée."); toutRendre();
+  });
+  $("#btn-athletes").addEventListener("click", async ()=>{
     etat.noms = [$("#a-nom1").value.trim()||"Athlète 1", $("#a-nom2").value.trim()||"Athlète 2"];
-    await sauverEtat(); message("Noms enregistrés."); toutRendre(); rendreAdmin();
+    await sauverEtat(); note("Athlètes enregistrés."); toutRendre(); rendreOrga();
   });
+
+  /* résultat */
+  $("#btn-resultat").addEventListener("click", async ()=>{
+    const d = defiPar($("#r-defi").value);
+    if(!d) return note("Choisissez une épreuve.", true);
+    d.resultat = $("#r-vainqueur").value;
+    d.score = $("#r-score").value.trim();
+    d.note  = $("#r-note").value.trim();
+    await sauverEtat();
+    $("#r-score").value=""; $("#r-note").value="";
+    const qui = d.resultat==="annule" ? "annulée" : (d.resultat==="1"?etat.noms[0]:etat.noms[1])+" déclaré vainqueur";
+    note(d.sport+" · "+qui+". Tickets réglés.");
+    toutRendre(); rendreOrga();
+  });
+
+  /* nouvelle épreuve */
+  let photoNouvelle = null;
+  brancherPhoto("btn-photo-n","fichier-n","apercu-n",640,280, url=>{ photoNouvelle = url; });
   $("#btn-ajouter").addEventListener("click", async ()=>{
     const sport = $("#n-sport").value.trim();
-    const date  = $("#n-date").value;
-    if(!sport) return message("Donne un nom au défi.", true);
-    if(!date)  return message("Choisis une date et une heure.", true);
+    const date = $("#n-date").value;
+    if(!sport) return note("Donnez un nom à l'épreuve.", true);
+    if(!date)  return note("Choisissez une date et une heure.", true);
     etat.defis.push({
-      id:"d"+Date.now().toString(36),
-      sport, date:new Date(date).toISOString(),
+      id:"d"+Date.now().toString(36), sport, date:new Date(date).toISOString(),
       c1:Math.max(1.01,parseFloat($("#n-c1").value)||1.9),
       c2:Math.max(1.01,parseFloat($("#n-c2").value)||1.9),
-      regle:$("#n-regle").value.trim(), resultat:null
+      regle:$("#n-regle").value.trim(), resultat:null, score:"", note:"", photo:photoNouvelle
     });
     await sauverEtat();
-    $("#n-sport").value=""; $("#n-regle").value="";
-    message("Défi ajouté."); toutRendre(); rendreAdmin();
+    $("#n-sport").value=""; $("#n-regle").value=""; photoNouvelle=null;
+    montrerApercu("apercu-n", null);
+    note("Épreuve ajoutée."); toutRendre(); rendreOrga();
   });
+
+  /* parieurs */
   $("#btn-recrediter").addEventListener("click", async ()=>{
-    if(!confirm("Tout le monde repart à 1 000 points. Les paris et les pronostics en cours sont effacés. On y va ?")) return;
-    const frais = await casier.lire(CLE_JOUEURS, true, {}) || {};
-    for(const p in frais){ frais[p].paris = []; frais[p].votes = {}; }
+    if(!confirm("Tout le monde repart à 1 000 points. Paris et pronostics effacés. On y va ?")) return;
+    const frais = await casier.lire(CLE_JOUEURS,true,{})||{};
+    for(const p in frais){ frais[p].paris=[]; frais[p].votes={}; }
     joueurs = frais;
-    await casier.ecrire(CLE_JOUEURS, frais, true);
-    message("Tout le monde est à 1 000 points."); toutRendre(); rendreAdmin();
+    await casier.ecrire(CLE_JOUEURS,frais,true);
+    note("Tout le monde est à 1 000 points."); toutRendre(); rendreOrga();
+  });
+
+  /* code et sauvegarde */
+  $("#btn-changer-code").addEventListener("click", async ()=>{
+    const c = $("#nouveau-code").value.trim();
+    if(c.length < 4) return note("Quatre caractères minimum.", true);
+    etat.empreinte = hacher(c);
+    await sauverEtat();
+    await casier.ecrire(CLE_ORGA,{empreinte:etat.empreinte},false);
+    $("#nouveau-code").value = "";
+    note("Code changé. L'ancien ne fonctionne plus.");
   });
   $("#btn-export").addEventListener("click", ()=>{ $("#export").value = JSON.stringify(etat); });
   $("#btn-import").addEventListener("click", async ()=>{
     try{
       const o = JSON.parse($("#export").value);
       if(!o || !Array.isArray(o.defis)) throw new Error("format");
-      o.empreinte = o.empreinte || etat.empreinte;   // on ne perd pas le code en restaurant
-      etat = o; await sauverEtat(); message("Sauvegarde restaurée."); toutRendre(); rendreAdmin();
-    }catch(e){ message("Ce texte n'est pas une sauvegarde valide.", true); }
+      o.empreinte = o.empreinte || etat.empreinte;
+      etat = o; await sauverEtat(); note("Sauvegarde restaurée."); toutRendre(); rendreOrga();
+    }catch(e){ note("Ce texte n'est pas une sauvegarde valide.", true); }
   });
 });
 </script>
